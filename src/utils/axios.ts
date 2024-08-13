@@ -40,4 +40,15 @@ export const endpoints = {
     getAllProducts: '/products',
     addProduct: '/add-product',
   },
+
+  workspaces: {
+    getAllWorkspaces: '/workspaces',
+    addWorkspace: '/workspaces',
+  },
+
+  airlinks: {
+    getAllAirlinks: '/airlinks',
+    getAirlinksByWorkstations: '/workspace/airlinks',
+    addAirlink: '/airlinks',
+  },
 };

@@ -43,7 +43,7 @@ export function dataGrid(theme: Theme) {
         },
         // Row, Cell
         cell: {
-          borderBottom: `1px dashed`,
+          borderBottom: `1px dashed ${alpha(theme.palette.primary.main, 0.08)}`,
           '&--editing': {
             boxShadow: 'none !important',
             backgroundColor: `${alpha(theme.palette.primary.main, 0.08)} !important`,
