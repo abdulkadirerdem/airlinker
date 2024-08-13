@@ -24,6 +24,7 @@ import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import { Button } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -48,6 +49,10 @@ export default function JwtLoginView() {
   const defaultValues = {
     email: 'test@test.com',
     password: '123456',
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:3000/auth/google';
   };
 
   const methods = useForm({
@@ -120,6 +125,8 @@ export default function JwtLoginView() {
       >
         Login
       </LoadingButton>
+
+      <Button onClick={handleGoogleLogin}>Google Auth</Button>
     </Stack>
   );
 

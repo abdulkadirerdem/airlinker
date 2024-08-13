@@ -34,6 +34,7 @@ export const endpoints = {
     me: '/auth/me',
     login: '/auth/login',
     register: '/auth/register',
+    logout: '/auth/logout',
   },
   products: {
     getAllProducts: '/products',

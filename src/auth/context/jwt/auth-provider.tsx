@@ -146,8 +146,13 @@ export function AuthProvider({ children }: Props) {
     []
   );
 
+  const deleteCookie = (name: string) => {
+    document.cookie = `${name}=; Max-Age=0; path=/;`;
+  };
+
   // LOGOUT
   const logout = useCallback(async () => {
+    deleteCookie("COOKIE-KEY")
     setSession();
     dispatch({ type: Types.LOGOUT });
   }, []);
