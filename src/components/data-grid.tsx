@@ -7,11 +7,6 @@ import Iconify from 'src/components/iconify';
 
 const columns: GridColDef[] = [
   {
-    field: 'id',
-    headerName: 'ID',
-    width: 120,
-  },
-  {
     field: 'title',
     headerName: 'Title',
     width: 160,
@@ -20,7 +15,7 @@ const columns: GridColDef[] = [
   {
     field: 'description',
     headerName: 'Description',
-    width: 160,
+    width: 360,
     editable: true,
   },
   {
@@ -64,12 +59,14 @@ const columns: GridColDef[] = [
 ];
 
 type Props = {
-  data: {
-    _id: string;
-    type: string;
-    title: string;
-    description: string;
-  }[];
+  data:
+    | {
+        _id: string;
+        type: string;
+        title: string;
+        description: string;
+      }[]
+    | undefined;
   error: any;
 };
 
@@ -79,10 +76,10 @@ export default function DataGridTable({ data, error }: Props) {
   }
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 2, width: 'fit-content' }}>
       <DataGrid
         columns={columns}
-        rows={data.map((item) => Object({ ...item, id: item._id }))}
+        rows={data ? data.map((item) => Object({ ...item, id: item._id })) : []}
         checkboxSelection
         disableRowSelectionOnClick
       />
