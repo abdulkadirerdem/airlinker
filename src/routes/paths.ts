@@ -8,7 +8,7 @@ const ROOTS = {
 // ----------------------------------------------------------------------
 
 export const paths = {
-  airlinkerUI: 'https://mui.com/store/items/airlinker-dashboard/',
+  minimalUI: 'https://mui.com/store/items/minimal-dashboard/',
   // AUTH
   auth: {
     jwt: {

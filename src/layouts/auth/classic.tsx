@@ -91,7 +91,7 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
       }}
     >
       {/* {renderLogo} */}
-      AirLinker
+      {/* AirLinker */}
 
       {mdUp && renderSection}
 
