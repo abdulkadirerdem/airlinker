@@ -3,13 +3,15 @@ import { useState, useEffect, useCallback } from 'react';
 
 import { fetcher } from 'src/utils/axios';
 
-const useFetcher = (args: string | [string, AxiosRequestConfig], interval = null) => {
-  const [data, setData] = useState(null);
+function useFetcher<T = any>(args: string | [string, AxiosRequestConfig] | null, interval = null) {
+  const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
+    if (args === null) return null;
+
     try {
       const response = await fetcher(args);
       setData(response);
@@ -33,6 +35,6 @@ const useFetcher = (args: string | [string, AxiosRequestConfig], interval = null
   }, [fetchData, interval]);
 
   return { data, error, isLoading, refetch: fetchData };
-};
+}
 
 export default useFetcher;
