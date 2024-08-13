@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, SetStateAction, Dispatch } from 'react';
+import { useState, Dispatch, useCallback, SetStateAction } from 'react';
 
 import Menu from '@mui/material/Menu';
 import List from '@mui/material/List';
@@ -46,11 +46,10 @@ export default function MenuView({
 
   return (
     <Box width="fit-content" mb={2}>
-      <List component="nav" aria-label="Device settings">
+      <List component="nav">
         <ListItemButton
           aria-haspopup="true"
           aria-controls="lock-menu"
-          aria-label="Workspaces"
           onClick={handleClickListItem}
         >
           <ListItemText primary={data[selectedIndex]?.title} secondary="Workspaces" />
@@ -61,7 +60,6 @@ export default function MenuView({
         {data.map((option: any, index: number) => (
           <MenuItem
             key={option?._id}
-            disabled={index === 0}
             selected={index === selectedIndex}
             onClick={(event) => handleMenuItemClick(event, index)}
           >

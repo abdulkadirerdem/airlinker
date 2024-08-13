@@ -9,19 +9,26 @@ const columns: GridColDef[] = [
   {
     field: 'title',
     headerName: 'Title',
-    width: 160,
+    flex: 2,
     editable: true,
   },
   {
     field: 'description',
     headerName: 'Description',
-    width: 360,
+    flex: 4,
     editable: true,
+  },
+  {
+    field: 'id',
+    headerName: 'AirLink',
+    flex: 5,
+    editable: true,
+    renderCell: (params) => `localhost:8083/${params.id}`,
   },
   {
     field: 'type',
     headerName: 'Type',
-    width: 160,
+    flex: 1,
     editable: true,
   },
   {
@@ -30,7 +37,7 @@ const columns: GridColDef[] = [
     headerName: 'Actions',
     align: 'right',
     headerAlign: 'right',
-    width: 80,
+    flex: 1,
     sortable: false,
     filterable: false,
     disableColumnMenu: true,
@@ -76,11 +83,10 @@ export default function DataGridTable({ data, error }: Props) {
   }
 
   return (
-    <Box sx={{ px: 2, width: 'fit-content' }}>
+    <Box sx={{ width: '100%' }}>
       <DataGrid
         columns={columns}
         rows={data ? data.map((item) => Object({ ...item, id: item._id })) : []}
-        checkboxSelection
         disableRowSelectionOnClick
       />
     </Box>

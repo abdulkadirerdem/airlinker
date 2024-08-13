@@ -1,11 +1,11 @@
-import ThreeView from 'src/sections/three/view';
+import { Box } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Dashboard: Three',
+  title: 'Dashboard: One',
 };
 
 export default function Page() {
-  return <ThreeView />;
+  return <Box>sadgasdf</Box>;
 }

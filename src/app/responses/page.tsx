@@ -1,11 +1,11 @@
-import SixView from 'src/sections/six/view';
+import { Box } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export const metadata = {
-  title: 'Dashboard: Six',
+  title: 'Dashboard: One',
 };
 
 export default function Page() {
-  return <SixView />;
+  return <Box>sadgasdf</Box>;
 }
