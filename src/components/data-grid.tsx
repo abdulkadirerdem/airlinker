@@ -53,6 +53,25 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         ),
       },
       {
+        field: 'responses-field',
+        headerName: 'Responses',
+        align: 'center',
+        headerAlign: 'center',
+        flex: 3,
+        renderCell: (params) => (
+          <Button
+            sx={{ alignSelf: 'center' }}
+            variant="contained"
+            // sx={{ cursor: 'pointer' }}
+            onClick={() => {
+              router.push(`/responses/${selectedWorkspaceId}/${params.id}`);
+            }}
+          >
+            Responses
+          </Button>
+        ),
+      },
+      {
         field: 'type',
         headerName: 'Type',
         flex: 1,

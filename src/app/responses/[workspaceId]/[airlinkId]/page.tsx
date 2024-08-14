@@ -1,17 +1,23 @@
+'use client';
+
 import { Container } from '@mui/material';
+
+import DashboardLayout from 'src/layouts/dashboard';
 
 import ResponseContent from 'src/sections/responses/ResponseContent';
 
 // ----------------------------------------------------------------------
 
-export const metadata = {
-  title: 'Form',
-};
+// export const metadata = {
+//   title: 'Form',
+// };
 
 export default function Page() {
   return (
     <Container maxWidth="md">
-      <ResponseContent />
+      <DashboardLayout>
+        <ResponseContent />
+      </DashboardLayout>
     </Container>
   );
 }
