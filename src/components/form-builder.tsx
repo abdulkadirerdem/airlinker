@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 
-import { Stack, Paper, Button, useTheme, TextField, Typography, IconButton } from '@mui/material';
+import {
+  Stack,
+  Paper,
+  Alert,
+  Button,
+  useTheme,
+  Snackbar,
+  TextField,
+  Typography,
+  IconButton,
+} from '@mui/material';
 
 import Iconify from 'src/components/iconify';
 
@@ -23,6 +33,7 @@ export default function FormBuilder({
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('Form Description');
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null); // Error state for validation messages
 
   useEffect(() => {
     if (selectedType) {
@@ -66,13 +77,49 @@ export default function FormBuilder({
     setComponents(newComponents);
   };
 
+  const validateForm = (): boolean => {
+    // Check if title and description are not empty
+    if (!title.trim() || !description.trim()) {
+      setError('Title and Description cannot be empty.');
+      return false;
+    }
+
+    // Check each component for validity
+    const invalidComponent = components.find((component) => {
+      if (!component.label.trim()) {
+        setError('All question labels must be filled.');
+        return true;
+      }
+
+      if (
+        (component.type === 'radio' || component.type === 'multiple-choice') &&
+        (!component.options || component.options.some((option) => !option.trim()))
+      ) {
+        setError('All options must be filled.');
+        return true;
+      }
+
+      return false;
+    });
+
+    if (invalidComponent) {
+      return false;
+    }
+
+    // No errors
+    setError(null);
+    return true;
+  };
+
   const saveForm = () => {
-    const form = {
-      title,
-      description,
-      components,
-    };
-    console.log('Form saved:', form);
+    if (validateForm()) {
+      const form = {
+        title,
+        description,
+        components,
+      };
+      console.log('Form saved:', form);
+    }
   };
 
   return (
@@ -175,7 +222,7 @@ export default function FormBuilder({
                 component.options?.map((option, optionIndex) => (
                   <Stack direction="row" alignItems="center" key={optionIndex} spacing={1}>
                     <TextField
-                      label={`Seçenek ${optionIndex + 1}`}
+                      label={`Option ${optionIndex + 1}`}
                       variant="outlined"
                       fullWidth
                       value={option}
@@ -197,7 +244,7 @@ export default function FormBuilder({
                       setComponents(newComponents);
                     }}
                   >
-                    Yeni Seçenek Ekle
+                    Add New Option
                   </Button>
                 )}
             </Stack>
@@ -209,6 +256,13 @@ export default function FormBuilder({
       <Button variant="contained" color="primary" onClick={saveForm}>
         Save Form
       </Button>
+
+      {/* Error Snackbar */}
+      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError(null)}>
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
