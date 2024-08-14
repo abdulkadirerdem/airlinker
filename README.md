@@ -26,8 +26,8 @@ Ensure you have the following installed:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/abdulkadirerdem/airlinker-frontend.git
-cd airlinker-frontend
+git clone https://github.com/abdulkadirerdem/airlinker.git
+cd airlinker
 npm install
 ```
 
