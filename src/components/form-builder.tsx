@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Stack, TextField, Typography } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 
 interface Component {
   type: string;
@@ -29,7 +29,17 @@ export default function FormBuilder({
   }, [onWidgetAdded, selectedType]);
 
   const addComponent = (type: string) => {
-    setComponents((prevComponents) => [...prevComponents, { type, label: '', options: [] }]);
+    const newComponent: Component = { type, label: '', options: type === 'text' ? [] : ['', ''] }; // radio ve multiple-choice için en az 2 seçenek
+
+    setComponents((prevComponents) => [...prevComponents, newComponent]);
+  };
+
+  const handleOptionChange = (index: number, optionIndex: number, value: string) => {
+    const newComponents = [...components];
+    if (newComponents[index].options) {
+      newComponents[index].options![optionIndex] = value;
+    }
+    setComponents(newComponents);
   };
 
   return (
@@ -83,18 +93,32 @@ export default function FormBuilder({
                 setComponents(newComponents);
               }}
             />
-            {component.type === 'multiple-choice' || component.type === 'radio' ? (
-              <Stack spacing={1}>
-                {[...Array(2)].map((_, optionIndex) => (
-                  <TextField
-                    key={optionIndex}
-                    label={`Seçenek ${optionIndex + 1}`}
-                    variant="outlined"
-                    fullWidth
-                  />
-                ))}
-              </Stack>
-            ) : null}
+            {(component.type === 'radio' || component.type === 'multiple-choice') &&
+              component.options?.map((option, optionIndex) => (
+                <TextField
+                  key={optionIndex}
+                  label={`Seçenek ${optionIndex + 1}`}
+                  variant="outlined"
+                  fullWidth
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                />
+              ))}
+            {/* Eğer radio veya multiple-choice ise, yeni seçenek ekleme butonu */}
+            {(component.type === 'radio' || component.type === 'multiple-choice') &&
+              component.options &&
+              component.options.length < 5 && (
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    const newComponents = [...components];
+                    newComponents[index].options?.push('');
+                    setComponents(newComponents);
+                  }}
+                >
+                  Yeni Seçenek Ekle
+                </Button>
+              )}
           </Stack>
         ))}
       </Stack>
