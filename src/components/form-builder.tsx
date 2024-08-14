@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-import { Stack, Button, TextField, Typography } from '@mui/material';
+import { Stack, TextField, Typography } from '@mui/material';
 
 interface Component {
   type: string;
@@ -8,24 +8,28 @@ interface Component {
   options?: string[];
 }
 
-export default function FormBuilder({ selectedType }: { selectedType: string | null }) {
+export default function FormBuilder({
+  selectedType,
+  onWidgetAdded,
+}: {
+  selectedType: string | null;
+  onWidgetAdded: () => void;
+}) {
   const [components, setComponents] = useState<Component[]>([]);
-  const [currentLabel, setCurrentLabel] = useState<string>('');
-  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
   const [title, setTitle] = useState<string>('Form Title');
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('Form Description');
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
 
-  const addComponent = () => {
+  useEffect(() => {
     if (selectedType) {
-      setComponents([
-        ...components,
-        { type: selectedType, label: currentLabel, options: currentOptions },
-      ]);
-      setCurrentLabel('');
-      setCurrentOptions([]);
+      addComponent(selectedType);
+      onWidgetAdded(); // Widget eklendikten sonra parent'a haber veriyoruz
     }
+  }, [onWidgetAdded, selectedType]);
+
+  const addComponent = (type: string) => {
+    setComponents((prevComponents) => [...prevComponents, { type, label: '', options: [] }]);
   };
 
   return (
@@ -64,6 +68,7 @@ export default function FormBuilder({ selectedType }: { selectedType: string | n
         )}
       </Stack>
 
+      {/* Form Components Section */}
       <Stack spacing={2}>
         {components.map((component, index) => (
           <Stack key={index} spacing={1}>
@@ -78,20 +83,20 @@ export default function FormBuilder({ selectedType }: { selectedType: string | n
                 setComponents(newComponents);
               }}
             />
-            {component.type === 'multiple-choice' ? (
-              <TextField
-                label="Seçenekler (Virgülle ayırın)"
-                variant="outlined"
-                fullWidth
-                value={currentOptions.join(',')}
-                onChange={(e) => setCurrentOptions(e.target.value.split(','))}
-              />
+            {component.type === 'multiple-choice' || component.type === 'radio' ? (
+              <Stack spacing={1}>
+                {[...Array(2)].map((_, optionIndex) => (
+                  <TextField
+                    key={optionIndex}
+                    label={`Seçenek ${optionIndex + 1}`}
+                    variant="outlined"
+                    fullWidth
+                  />
+                ))}
+              </Stack>
             ) : null}
           </Stack>
         ))}
-        <Button onClick={addComponent} variant="contained">
-          Bileşen Ekle
-        </Button>
       </Stack>
     </Stack>
   );
