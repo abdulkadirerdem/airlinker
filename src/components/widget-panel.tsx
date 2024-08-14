@@ -1,6 +1,16 @@
+import { OverridableStringUnion } from '@mui/types';
+import { ButtonPropsColorOverrides } from '@mui/material/Button';
 import { Box, Stack, Button, Divider, Typography } from '@mui/material';
 
-const widgets = [
+const widgets: Array<{
+  type: string;
+  label: string;
+  defaultOptions?: [] | [string] | any;
+  color: OverridableStringUnion<
+    'primary' | 'secondary' | 'info' | 'error' | 'warning' | 'success' | 'inherit',
+    ButtonPropsColorOverrides
+  >;
+}> = [
   {
     type: 'radio',
     label: 'Radio Button',
@@ -30,11 +40,11 @@ export default function WidgetPanel({
       <Stack spacing={1} flexWrap="wrap" flexDirection="row">
         {widgets.map((widget) => (
           <Button
+            color={widget.color}
             sx={{ maxWidth: '50%' }}
             key={widget.type}
             onClick={() => onSelect(widget.type, widget.defaultOptions)}
             variant="contained"
-            color={widget.color}
           >
             {widget.label}
           </Button>

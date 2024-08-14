@@ -1,6 +1,6 @@
 import { Container } from '@mui/material';
 
-import FormContent from 'src/sections/form/FormContent';
+import ResponseContent from 'src/sections/responses/ResponseContent';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ export const metadata = {
 export default function Page() {
   return (
     <Container maxWidth="md">
-      <FormContent />
+      <ResponseContent />
     </Container>
   );
 }
