@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import Container from '@mui/material/Container';
-import { Grid, Paper, Button, useTheme, Stack } from '@mui/material';
+import { Grid, Paper, Stack, Button, useTheme } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -38,10 +38,7 @@ export default function OneView() {
     refetch: WorkspaceRefetch,
   } = useQuery({
     queryKey: ['workspaces'],
-    queryFn: async () => {
-      const result = await getAllWorkspaces();
-      return result;
-    },
+    queryFn: getAllWorkspaces,
   });
 
   const selectedWorkspaceId = data?.[selectedIndex]?._id;
@@ -178,7 +175,11 @@ export default function OneView() {
       {isAirlinkLoading ? (
         'Loading...'
       ) : (
-        <DataGridTable data={airlinkData || []} error={airlinkError} />
+        <DataGridTable
+          data={airlinkData || []}
+          error={airlinkError}
+          selectedWorkspaceId={selectedWorkspaceId}
+        />
       )}
     </Container>
   );
