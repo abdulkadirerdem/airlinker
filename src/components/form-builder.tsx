@@ -167,8 +167,9 @@ export default function FormBuilder({
         title: form.title,
         type: 'form',
         workspace: workspaceId,
-      }).then((item) => {
+      }).then((item: any) => {
         toast.success('Airlink created!', { duration: 2000 });
+        // const airlinkId = item._id.toString();
 
         formMutateAsync({
           description: form.description,
