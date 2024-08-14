@@ -132,7 +132,6 @@ export default function FormBuilder({
       if (
         (component.type === 'radio' || component.type === 'multiple-choice') &&
         (component.options === undefined ||
-          component.options === undefined ||
           component.options?.length < 2 ||
           component.options?.length > 5)
       ) {
