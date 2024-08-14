@@ -1,9 +1,9 @@
 export interface WorkspaceAPI {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
-  user: string;
-  airlinks: Array<AirlinkAPI> | null;
+  user?: string;
+  airlinks?: Array<AirlinkAPI> | null;
 }
 
 export interface AirlinkAPI {
