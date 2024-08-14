@@ -131,8 +131,10 @@ export default function FormBuilder({
 
       if (
         (component.type === 'radio' || component.type === 'multiple-choice') &&
-        ((component.options && component.options?.length < 2) ||
-          (component.options && component.options?.length > 5))
+        (component.options === undefined ||
+          component.options === undefined ||
+          component.options?.length < 2 ||
+          component.options?.length > 5)
       ) {
         setError('Options must be between 2 and 5.');
         return true;
