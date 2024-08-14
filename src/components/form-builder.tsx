@@ -294,7 +294,7 @@ export default function FormBuilder({
                   </Stack>
                 ))}
               {(component.type === 'radio' || component.type === 'multiple-choice') &&
-                component.options &&
+                component.options !== undefined &&
                 component.options.length < 5 && (
                   <Button
                     variant="outlined"
