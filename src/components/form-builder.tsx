@@ -27,12 +27,12 @@ export default function FormBuilder({
   useEffect(() => {
     if (selectedType) {
       addComponent(selectedType);
-      onWidgetAdded(); // Widget eklendikten sonra parent'a haber veriyoruz
+      onWidgetAdded(); // Notify parent when a widget is added
     }
   }, [onWidgetAdded, selectedType]);
 
   const addComponent = (type: string) => {
-    const newComponent: Component = { type, label: '', options: type === 'text' ? [] : ['', ''] }; // radio ve multiple-choice için en az 2 seçenek
+    const newComponent: Component = { type, label: '', options: type === 'text' ? [] : ['', ''] };
     setComponents((prevComponents) => [...prevComponents, newComponent]);
   };
 
@@ -58,6 +58,14 @@ export default function FormBuilder({
     setComponents(newComponents);
   };
 
+  const moveComponent = (index: number, direction: 'up' | 'down') => {
+    const newComponents = [...components];
+    const [movedComponent] = newComponents.splice(index, 1);
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    newComponents.splice(newIndex, 0, movedComponent);
+    setComponents(newComponents);
+  };
+
   const saveForm = () => {
     const form = {
       title,
@@ -71,9 +79,10 @@ export default function FormBuilder({
     <Stack spacing={2}>
       {/* Title Section */}
       <Stack spacing={1}>
-        {isTitleEditing ? (
+        {isTitleEditing || title?.length === 0 ? (
           <TextField
             value={title}
+            placeholder="Title"
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => setIsTitleEditing(false)}
             autoFocus
@@ -88,9 +97,10 @@ export default function FormBuilder({
 
       {/* Description Section */}
       <Stack spacing={1}>
-        {isDescriptionEditing ? (
+        {isDescriptionEditing || description?.length === 0 ? (
           <TextField
             value={description}
+            placeholder="Description"
             onChange={(e) => setDescription(e.target.value)}
             onBlur={() => setIsDescriptionEditing(false)}
             autoFocus
@@ -125,9 +135,25 @@ export default function FormBuilder({
                     }}
                   >{`(${component.type})`}</span>
                 </Typography>
-                <IconButton onClick={() => removeComponent(index)}>
-                  <Iconify icon="solar:close-circle-bold" />
-                </IconButton>
+                <Stack direction="row">
+                  <IconButton
+                    size="small"
+                    onClick={() => moveComponent(index, 'up')}
+                    disabled={index === 0}
+                  >
+                    <Iconify icon="solar:arrow-up-bold" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => moveComponent(index, 'down')}
+                    size="small"
+                    disabled={index === components.length - 1}
+                  >
+                    <Iconify icon="solar:arrow-down-bold" />
+                  </IconButton>
+                  <IconButton sx={{ ml: 1 }} color="error" onClick={() => removeComponent(index)}>
+                    <Iconify icon="solar:close-circle-bold" />
+                  </IconButton>
+                </Stack>
               </Stack>
               <TextField
                 label="Soru Metni"
