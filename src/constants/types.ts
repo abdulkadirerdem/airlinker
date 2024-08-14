@@ -23,3 +23,10 @@ export interface AirlinkAPI {
   form?: FormAPI;
   workspace: string;
 }
+
+export interface QuestionType {
+  _id?: any;
+  title: string;
+  type: string;
+  options: Array<string>;
+}

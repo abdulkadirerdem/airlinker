@@ -18,8 +18,8 @@ import {
 
 import { usePathname } from 'src/routes/hooks';
 
+import { QuestionType } from 'src/constants/types';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
-import { AirlinkAPI } from 'src/constants/types';
 
 // ----------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ export default function FormContent() {
     return <p style={{ padding: 5 }}>Something went wrong!</p>;
   }
 
-  const formData =
+  const formData: any =
     !isLoading && data !== undefined ? data.filter((item) => item?._id === airlinkId)[0] : [];
 
   console.info(!isLoading ? data : []);
@@ -79,7 +79,7 @@ export default function FormContent() {
           handleSubmit();
         }}
       >
-        {formData.form.questions.map((question, qIndex) => (
+        {formData.form.questions.map((question: QuestionType, qIndex: number) => (
           <FormControl key={question._id} component="fieldset" margin="normal" fullWidth>
             <Typography variant="h6" fontWeight={500} mb={0.5}>
               <span style={{ fontWeight: 700 }}>{`${qIndex + 1}. `}</span>
