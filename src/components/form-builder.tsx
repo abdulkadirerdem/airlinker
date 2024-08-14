@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
@@ -13,14 +14,13 @@ import {
   IconButton,
 } from '@mui/material';
 
+import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { createForm } from 'src/api/form/createForm';
 import { createAirlink } from 'src/api/airlink/createAirlink';
 
 import Iconify from 'src/components/iconify';
-import toast from 'react-hot-toast';
-import { paths } from 'src/routes/paths';
 
 interface Component {
   type: string;
