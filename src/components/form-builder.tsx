@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import { Stack, Button, TextField, Typography, Paper, useTheme } from '@mui/material';
+import { Stack, Paper, Button, useTheme, TextField, Typography, IconButton } from '@mui/material';
+
+import Iconify from 'src/components/iconify';
 
 interface Component {
   type: string;
@@ -31,7 +33,6 @@ export default function FormBuilder({
 
   const addComponent = (type: string) => {
     const newComponent: Component = { type, label: '', options: type === 'text' ? [] : ['', ''] }; // radio ve multiple-choice için en az 2 seçenek
-
     setComponents((prevComponents) => [...prevComponents, newComponent]);
   };
 
@@ -39,6 +40,20 @@ export default function FormBuilder({
     const newComponents = [...components];
     if (newComponents[index].options) {
       newComponents[index].options![optionIndex] = value;
+    }
+    setComponents(newComponents);
+  };
+
+  const removeComponent = (index: number) => {
+    setComponents((prevComponents) => prevComponents.filter((_, i) => i !== index));
+  };
+
+  const removeOption = (componentIndex: number, optionIndex: number) => {
+    const newComponents = [...components];
+    if (newComponents[componentIndex].options) {
+      newComponents[componentIndex].options = newComponents[componentIndex].options!.filter(
+        (_, i) => i !== optionIndex
+      );
     }
     setComponents(newComponents);
   };
@@ -93,22 +108,27 @@ export default function FormBuilder({
         {components.map((component, index) => (
           <Paper key={index} elevation={4} sx={{ p: 1.5 }}>
             <Stack spacing={1}>
-              <Typography variant="subtitle1">
-                {`Question ${index + 1}  `}
-                <span
-                  style={{
-                    textTransform: 'capitalize',
-                    fontSize: 12,
-                    color:
-                      // eslint-disable-next-line no-nested-ternary
-                      component.type === 'text'
-                        ? theme.palette.warning.main
-                        : component.type === 'radio'
-                          ? theme.palette.info.main
-                          : theme.palette.error.main,
-                  }}
-                >{`(${component.type})`}</span>
-              </Typography>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="subtitle1">
+                  {`Question ${index + 1} `}
+                  <span
+                    style={{
+                      textTransform: 'capitalize',
+                      fontSize: 12,
+                      color:
+                        // eslint-disable-next-line no-nested-ternary
+                        component.type === 'text'
+                          ? theme.palette.warning.main
+                          : component.type === 'radio'
+                            ? theme.palette.info.main
+                            : theme.palette.error.main,
+                    }}
+                  >{`(${component.type})`}</span>
+                </Typography>
+                <IconButton onClick={() => removeComponent(index)}>
+                  <Iconify icon="solar:close-circle-bold" />
+                </IconButton>
+              </Stack>
               <TextField
                 label="Soru Metni"
                 variant="filled"
@@ -127,14 +147,18 @@ export default function FormBuilder({
               )}
               {(component.type === 'radio' || component.type === 'multiple-choice') &&
                 component.options?.map((option, optionIndex) => (
-                  <TextField
-                    key={optionIndex}
-                    label={`Seçenek ${optionIndex + 1}`}
-                    variant="outlined"
-                    fullWidth
-                    value={option}
-                    onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                  />
+                  <Stack direction="row" alignItems="center" key={optionIndex} spacing={1}>
+                    <TextField
+                      label={`Seçenek ${optionIndex + 1}`}
+                      variant="outlined"
+                      fullWidth
+                      value={option}
+                      onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                    />
+                    <IconButton onClick={() => removeOption(index, optionIndex)}>
+                      <Iconify icon="solar:close-circle-bold" />
+                    </IconButton>
+                  </Stack>
                 ))}
               {(component.type === 'radio' || component.type === 'multiple-choice') &&
                 component.options &&
