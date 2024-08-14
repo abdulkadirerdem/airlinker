@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
@@ -13,14 +14,13 @@ import {
   IconButton,
 } from '@mui/material';
 
+import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { createForm } from 'src/api/form/createForm';
 import { createAirlink } from 'src/api/airlink/createAirlink';
 
 import Iconify from 'src/components/iconify';
-import toast from 'react-hot-toast';
-import { paths } from 'src/routes/paths';
 
 interface Component {
   type: string;
@@ -131,7 +131,9 @@ export default function FormBuilder({
 
       if (
         (component.type === 'radio' || component.type === 'multiple-choice') &&
-        (component.options?.length < 2 || component.options?.length > 5)
+        (component.options === undefined ||
+          component.options?.length < 2 ||
+          component.options?.length > 5)
       ) {
         setError('Options must be between 2 and 5.');
         return true;
@@ -293,7 +295,7 @@ export default function FormBuilder({
                   </Stack>
                 ))}
               {(component.type === 'radio' || component.type === 'multiple-choice') &&
-                component.options &&
+                component.options !== undefined &&
                 component.options.length < 5 && (
                   <Button
                     variant="outlined"
