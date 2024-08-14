@@ -143,7 +143,7 @@ export default function OneView() {
               background: theme.palette.success.lighter,
             }}
           >
-            Template 1
+            Create New Game
           </Paper>
         </Grid>
         <Grid item xs={2.45}>
@@ -164,7 +164,7 @@ export default function OneView() {
               background: theme.palette.info.lighter,
             }}
           >
-            Template 2
+            Template 1
           </Paper>
         </Grid>
         <Grid item xs={2.45}>
@@ -185,7 +185,7 @@ export default function OneView() {
               background: theme.palette.error.lighter,
             }}
           >
-            Template 3
+            Template 2
           </Paper>
         </Grid>
       </Grid>
