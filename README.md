@@ -31,6 +31,8 @@ cd airlinker
 npm install
 ```
 
+and change then name of the .env.example folders name to .env
+
 ### Running the Project
 
 To start the development server:
