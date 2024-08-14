@@ -14,3 +14,12 @@ export interface AirlinkAPI {
   form: string;
   workspace: string;
 }
+
+export interface FormAPI {
+  _id: string;
+  title: string;
+  description: string;
+  questions: Array<{ title: string; type: string; options: Array<string> }>;
+  responses: [string];
+  airlink: string;
+}
