@@ -16,6 +16,14 @@ import { AuthProvider } from 'src/auth/context/jwt';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 
+import { clusterApiUrl } from '@solana/web3.js';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { WalletProvider, ConnectionProvider } from '@solana/wallet-adapter-react';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { useMemo } from 'react';
+
+require('@solana/wallet-adapter-react-ui/styles.css');
 // ----------------------------------------------------------------------
 
 const queryClient = new QueryClient();
@@ -46,32 +54,46 @@ type Props = {
 };
 
 export default function RootLayout({ children }: Props) {
+  const network = WalletAdapterNetwork.Devnet; // Mainnet, Testnet veya Devnet seçin
+
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+
+  const wallets = useMemo(
+    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter({ network })],
+    [network]
+  );
   return (
     <html lang="en" className={primaryFont.className}>
       <body>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <SettingsProvider
-              defaultSettings={{
-                themeMode: 'dark', // 'light' | 'dark'
-                themeDirection: 'ltr', //  'rtl' | 'ltr'
-                themeContrast: 'default', // 'default' | 'bold'
-                themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
-                themeColorPresets: 'red', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
-                themeStretch: false,
-              }}
-            >
-              <ThemeProvider>
-                <MotionLazy>
-                  <SettingsDrawer />
-                  <ProgressBar />
-                  {children}
-                  <Toaster />
-                </MotionLazy>
-              </ThemeProvider>
-            </SettingsProvider>
-          </AuthProvider>
-        </QueryClientProvider>
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                  <SettingsProvider
+                    defaultSettings={{
+                      themeMode: 'dark', // 'light' | 'dark'
+                      themeDirection: 'ltr', //  'rtl' | 'ltr'
+                      themeContrast: 'default', // 'default' | 'bold'
+                      themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
+                      themeColorPresets: 'red', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
+                      themeStretch: false,
+                    }}
+                  >
+                    <ThemeProvider>
+                      <MotionLazy>
+                        <SettingsDrawer />
+                        <ProgressBar />
+                        {children}
+                        <Toaster />
+                      </MotionLazy>
+                    </ThemeProvider>
+                  </SettingsProvider>
+                </AuthProvider>
+              </QueryClientProvider>
+            </WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
       </body>
     </html>
   );

@@ -35,6 +35,7 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
   const renderContent = (
     <Stack
       sx={{
+        backgroundColor: 'background.paper',
         width: 1,
         mx: 'auto',
         maxWidth: 480,

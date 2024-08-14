@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import Link from '@mui/material/Link';
 import { Button } from '@mui/material';
@@ -28,7 +27,6 @@ import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import TokenTransferForm from 'src/components/web-3/TokenTransferForm';
 
 // ----------------------------------------------------------------------
 
@@ -155,7 +153,7 @@ export default function JwtLoginView() {
         {renderForm}
       </FormProvider>
 
-      <WalletMultiButton />
+      {/* <WalletMultiButton />
 
       {wallet.connected ? (
         <TokenTransferForm tokens={tokens} />
@@ -163,7 +161,7 @@ export default function JwtLoginView() {
         <Alert severity="warning" sx={{ mt: 3 }}>
           Please connect your wallet to access the token transfer form.
         </Alert>
-      )}
+      )} */}
     </>
   );
 }

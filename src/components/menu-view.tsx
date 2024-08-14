@@ -1,13 +1,8 @@
 'use client';
 
-import { useState, Dispatch, useCallback, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
-import Menu from '@mui/material/Menu';
-import List from '@mui/material/List';
-import MenuItem from '@mui/material/MenuItem';
-import { Box, Typography } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
+import { Box, Select, MenuItem, Typography, InputLabel, FormControl } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -22,51 +17,35 @@ export default function MenuView({
   selectedIndex: number;
   setSelectedIndex: Dispatch<SetStateAction<number>>;
 }) {
-  const [isOpenList, setOpenList] = useState<null | HTMLElement>(null);
-
-  const handleClickListItem = useCallback((event: React.MouseEvent<HTMLElement>) => {
-    setOpenList(event.currentTarget);
-  }, []);
-
-  const handleMenuItemClick = useCallback(
-    (event: React.MouseEvent<HTMLElement>, index: number) => {
-      setSelectedIndex(index);
-      setOpenList(null);
-    },
-    [setSelectedIndex]
-  );
-
-  const handleClose = useCallback(() => {
-    setOpenList(null);
-  }, []);
+  const handleChange = (event: any) => {
+    setSelectedIndex(event.target.value);
+  };
 
   if (error) {
     return <Typography color="error">Something went wrong!</Typography>;
   }
 
   return (
-    <Box width="fit-content" mb={2}>
-      <List component="nav">
-        <ListItemButton
-          aria-haspopup="true"
-          aria-controls="lock-menu"
-          onClick={handleClickListItem}
+    <Box width="fit-content" mb={2} minWidth={250}>
+      <FormControl fullWidth>
+        <InputLabel id="select-label">Workspaces</InputLabel>
+        <Select
+          sx={{
+            backgroundColor: 'white',
+          }}
+          labelId="select-label"
+          id="select"
+          value={selectedIndex}
+          onChange={handleChange}
+          label="Workspaces"
         >
-          <ListItemText primary={data[selectedIndex]?.title} secondary="Workspaces" />
-        </ListItemButton>
-      </List>
-
-      <Menu id="lock-menu" anchorEl={isOpenList} onClose={handleClose} open={Boolean(isOpenList)}>
-        {data.map((option: any, index: number) => (
-          <MenuItem
-            key={option?._id}
-            selected={index === selectedIndex}
-            onClick={(event) => handleMenuItemClick(event, index)}
-          >
-            {option?.title}
-          </MenuItem>
-        ))}
-      </Menu>
+          {data.map((option: any, index: number) => (
+            <MenuItem key={option?._id} value={index}>
+              {option?.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </Box>
   );
 }

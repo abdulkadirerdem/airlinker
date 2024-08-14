@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 import Container from '@mui/material/Container';
-import { Grid, Paper, Stack, Button, useTheme } from '@mui/material';
+import { Box, Grid, Paper, Stack, Button, useTheme } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+
+import { useResponsive } from 'src/hooks/use-responsive';
 
 import { createWorkspace } from 'src/api/workspace/createWorkspace';
 import { getAllWorkspaces } from 'src/api/workspace/getAllWorkspaces';
@@ -25,6 +27,7 @@ export default function OneView() {
   const theme = useTheme();
   const settings = useSettingsContext();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const lgUp = useResponsive('up', 'lg');
 
   const { isPending, mutateAsync } = useMutation({
     mutationKey: ['create-workspace'],
@@ -65,6 +68,21 @@ export default function OneView() {
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+      {lgUp && (
+        <Box
+          component="img"
+          src="/assets/images/logo/airy.png"
+          sx={{
+            height: 88,
+            mr: 2.5,
+            position: 'absolute',
+            top: 67,
+            right: 270,
+            zIndex: 9,
+            transform: 'scaleX(-1)',
+          }}
+        />
+      )}
       {isLoading ? (
         'Loading...'
       ) : (
