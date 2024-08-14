@@ -1,17 +1,28 @@
-import { Box, Stack } from '@mui/material';
+'use client';
 
-// ----------------------------------------------------------------------
+import { useState } from 'react';
 
-export const metadata = {
-  title: 'Dashboard: One',
-};
+import { Stack, Paper, Container } from '@mui/material';
+
+import FormBuilder from 'src/components/form-builder';
+import WidgetPanel from 'src/components/widget-panel';
 
 export default function Page() {
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+
   return (
-    <Stack direction="row">
-      <Stack flex={1}>a</Stack>
-      <Stack flex={4}>b</Stack>
-      <Stack flex={1} />
-    </Stack>
+    <Container maxWidth="xl">
+      <Stack direction="row" spacing={2}>
+        <Stack flex={2}>
+          <Paper elevation={4} sx={{ height: 300 }}>
+            <WidgetPanel onSelect={setSelectedType} />
+          </Paper>
+        </Stack>
+        <Stack flex={4}>
+          <FormBuilder selectedType={selectedType} />
+        </Stack>
+        <Stack flex={2} />
+      </Stack>
+    </Container>
   );
 }
