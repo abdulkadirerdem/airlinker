@@ -19,11 +19,13 @@ import {
   FormControlLabel,
 } from '@mui/material';
 
+import { useRouter } from 'src/routes/hooks';
 import { usePathname } from 'src/routes/hooks';
 
 import { QuestionType } from 'src/constants/types';
 import { submitForm } from 'src/api/form/submitForm';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
+import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -37,6 +39,7 @@ export default function FormContent() {
   const airlinkId = pathname.split('/')[3];
   const [answers, setAnswers] = useState<{ [key: string]: string | string[] }>({});
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     data,
@@ -102,6 +105,8 @@ export default function FormContent() {
       await mutateAsync({ id: formData.form._id, data: answers });
       // Başarılı işlem sonrası yapılacaklar
       console.log('Form submitted successfully');
+
+      router.push(paths.dashboard.root);
     } catch (err) {
       console.error('Error submitting form:', err);
     }

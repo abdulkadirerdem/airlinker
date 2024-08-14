@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useState, useCallback } from 'react';
 
 import Stack from '@mui/material/Stack';

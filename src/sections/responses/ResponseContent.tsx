@@ -2,11 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { Paper, Typography } from '@mui/material';
+import { Divider, Paper, Typography } from '@mui/material';
 
 import { usePathname } from 'src/routes/hooks';
 
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
+
+import QuestionWithAnswer from 'src/components/questions-with-answers';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +40,8 @@ export default function ResponseContent() {
   const formData: any =
     !isLoading && data !== undefined ? data.filter((item) => item?._id === airlinkId)[0] : [];
 
+  console.log('Dataa: ', formData);
+
   if (isLoading) return 'Loading...';
 
   return (
@@ -51,6 +55,25 @@ export default function ResponseContent() {
       <Typography variant="subtitle1" gutterBottom>
         {formData.description}
       </Typography>
+
+      {formData.form.responses.map((response: any, index: number) => (
+        <Paper elevation={6} sx={{ p: 2, mt: 3 }} key={response._id}>
+          <Typography variant="h5" gutterBottom>
+            Client {index + 1}
+          </Typography>
+          <Divider sx={{ mb: 2, borderWidth: 0.25 }} />
+          {formData.form.questions.map((question: any) => (
+            <QuestionWithAnswer
+              key={question._id}
+              questionTitle={question.title}
+              answer={
+                response.answers.filter((item: any) => item.questionId === question._id)[0]
+                  ?.answer || 'Yanıt yok'
+              }
+            />
+          ))}
+        </Paper>
+      ))}
     </Paper>
   );
 }
