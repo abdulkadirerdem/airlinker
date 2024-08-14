@@ -4,8 +4,10 @@ import * as Yup from 'yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 import Link from '@mui/material/Link';
+import { Button } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -17,6 +19,7 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useRouter, useSearchParams } from 'src/routes/hooks';
 
+import useTokens from 'src/hooks/use-tokens';
 import { useBoolean } from 'src/hooks/use-boolean';
 
 import { useAuthContext } from 'src/auth/hooks';
@@ -24,16 +27,18 @@ import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
-import { Button } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
 export default function JwtLoginView() {
   const { login } = useAuthContext();
+  const wallet = useWallet(); // Cüzdan bağlantısı kontrolü
 
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState('');
+  // Use the custom useTokens hook to get tokens with metadata
+  const tokens = useTokens(wallet.publicKey);
 
   const searchParams = useSearchParams();
 
@@ -147,6 +152,16 @@ export default function JwtLoginView() {
       <FormProvider methods={methods} onSubmit={onSubmit}>
         {renderForm}
       </FormProvider>
+
+      {/* <WalletMultiButton />
+
+      {wallet.connected ? (
+        <TokenTransferForm tokens={tokens} />
+      ) : (
+        <Alert severity="warning" sx={{ mt: 3 }}>
+          Please connect your wallet to access the token transfer form.
+        </Alert>
+      )} */}
     </>
   );
 }

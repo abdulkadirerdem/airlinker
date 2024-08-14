@@ -24,6 +24,7 @@ const widgets: Array<{
     color: 'error',
   },
   { type: 'text', label: 'Text Field', color: 'warning' },
+  { type: 'connect-wallet', label: 'Connect Wallet', color: 'success' },
 ];
 
 export default function WidgetPanel({

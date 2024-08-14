@@ -1,6 +1,7 @@
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import {
   Stack,
@@ -264,51 +265,57 @@ export default function FormBuilder({
                   </IconButton>
                 </Stack>
               </Stack>
-              <TextField
-                label="Soru Metni"
-                variant="filled"
-                fullWidth
-                value={component.label}
-                onChange={(e) => {
-                  const newComponents = [...components];
-                  newComponents[index].label = e.target.value;
-                  setComponents(newComponents);
-                }}
-              />
-              {component.type !== 'text' && (
-                <Typography variant="subtitle2" mt={1}>
-                  Options
-                </Typography>
-              )}
-              {(component.type === 'radio' || component.type === 'multiple-choice') &&
-                component.options?.map((option, optionIndex) => (
-                  <Stack direction="row" alignItems="center" key={optionIndex} spacing={1}>
-                    <TextField
-                      label={`Option ${optionIndex + 1}`}
-                      variant="outlined"
-                      fullWidth
-                      value={option}
-                      onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                    />
-                    <IconButton onClick={() => removeOption(index, optionIndex)}>
-                      <Iconify icon="solar:close-circle-bold" />
-                    </IconButton>
-                  </Stack>
-                ))}
-              {(component.type === 'radio' || component.type === 'multiple-choice') &&
-                component.options !== undefined &&
-                component.options.length < 5 && (
-                  <Button
-                    variant="outlined"
-                    onClick={() => {
+              {component.type !== 'connect-wallet' ? (
+                <>
+                  <TextField
+                    label="Soru Metni"
+                    variant="filled"
+                    fullWidth
+                    value={component.label}
+                    onChange={(e) => {
                       const newComponents = [...components];
-                      newComponents[index].options?.push('');
+                      newComponents[index].label = e.target.value;
                       setComponents(newComponents);
                     }}
-                  >
-                    Add New Option
-                  </Button>
-                )}
+                  />
+                  {component.type !== 'text' && (
+                    <Typography variant="subtitle2" mt={1}>
+                      Options
+                    </Typography>
+                  )}
+                  {(component.type === 'radio' || component.type === 'multiple-choice') &&
+                    component.options?.map((option, optionIndex) => (
+                      <Stack direction="row" alignItems="center" key={optionIndex} spacing={1}>
+                        <TextField
+                          label={`Option ${optionIndex + 1}`}
+                          variant="outlined"
+                          fullWidth
+                          value={option}
+                          onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                        />
+                        <IconButton onClick={() => removeOption(index, optionIndex)}>
+                          <Iconify icon="solar:close-circle-bold" />
+                        </IconButton>
+                      </Stack>
+                    ))}
+                  {(component.type === 'radio' || component.type === 'multiple-choice') &&
+                    component.options &&
+                    component.options.length < 5 && (
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          const newComponents = [...components];
+                          newComponents[index].options?.push('');
+                          setComponents(newComponents);
+                        }}
+                      >
+                        Add New Option
+                      </Button>
+                    )}
+                </>
+              ) : (
+                <WalletMultiButton />
+              )}
             </Stack>
           </Paper>
         ))}

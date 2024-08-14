@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { alpha } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
 
-import Logo from '../logo';
-
 // ----------------------------------------------------------------------
 
 export default function SplashScreen({ sx, ...other }: BoxProps) {
@@ -50,7 +48,7 @@ export default function SplashScreen({ sx, ...other }: BoxProps) {
           }}
         >
           {/* <Logo disabledLink sx={{ width: 64, height: 64 }} /> */}
-          AirLinker
+          <Box component="img" src="/assets/images/logo/airy.png" sx={{ height: 48, mr: 2.5 }} />
         </m.div>
 
         <Box

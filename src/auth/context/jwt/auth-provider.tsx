@@ -1,6 +1,6 @@
 'use client';
-
 import { useMemo, useEffect, useReducer, useCallback } from 'react';
+
 
 import axios, { endpoints } from 'src/utils/axios';
 
@@ -152,7 +152,7 @@ export function AuthProvider({ children }: Props) {
 
   // LOGOUT
   const logout = useCallback(async () => {
-    deleteCookie("COOKIE-KEY")
+    deleteCookie('COOKIE-KEY');
     setSession();
     dispatch({ type: Types.LOGOUT });
   }, []);
