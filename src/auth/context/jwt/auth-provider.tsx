@@ -1,6 +1,11 @@
 'use client';
 
+import { clusterApiUrl } from '@solana/web3.js';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { useMemo, useEffect, useReducer, useCallback } from 'react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { WalletProvider, ConnectionProvider } from '@solana/wallet-adapter-react';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
 
 import axios, { endpoints } from 'src/utils/axios';
 
@@ -8,6 +13,7 @@ import { AuthContext } from './auth-context';
 import { setSession, isValidToken } from './utils';
 import { AuthUserType, ActionMapType, AuthStateType } from '../../types';
 
+require('@solana/wallet-adapter-react-ui/styles.css');
 // ----------------------------------------------------------------------
 
 enum Types {
@@ -74,6 +80,14 @@ type Props = {
 };
 
 export function AuthProvider({ children }: Props) {
+  const network = WalletAdapterNetwork.Devnet; // Mainnet, Testnet veya Devnet seçin
+
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+
+  const wallets = useMemo(
+    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter({ network })],
+    [network]
+  );
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const initialize = useCallback(async () => {
@@ -152,7 +166,7 @@ export function AuthProvider({ children }: Props) {
 
   // LOGOUT
   const logout = useCallback(async () => {
-    deleteCookie("COOKIE-KEY")
+    deleteCookie('COOKIE-KEY');
     setSession();
     dispatch({ type: Types.LOGOUT });
   }, []);
@@ -176,5 +190,13 @@ export function AuthProvider({ children }: Props) {
     [login, logout, register, state.user, status]
   );
 
-  return <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>;
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <AuthContext.Provider value={memoizedValue}>{children}</AuthContext.Provider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  );
 }
