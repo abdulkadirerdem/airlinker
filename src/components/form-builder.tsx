@@ -99,6 +99,14 @@ export default function FormBuilder({
         return true;
       }
 
+      if (
+        (component.type === 'radio' || component.type === 'multiple-choice') &&
+        (component.options?.length < 2 || component.options?.length > 5)
+      ) {
+        setError('Options must be between 2 and 5.');
+        return true;
+      }
+
       return false;
     });
 
