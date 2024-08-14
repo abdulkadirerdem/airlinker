@@ -28,4 +28,13 @@ export const paths = {
       six: `${ROOTS.DASHBOARD}/group/six`,
     },
   },
+  builder: {
+    root: '/builder',
+  },
+  responses: {
+    root: '/responses',
+  },
+  settings: {
+    root: '/settings',
+  },
 };
