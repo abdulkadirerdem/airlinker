@@ -47,7 +47,6 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
             variant="text"
             // sx={{ cursor: 'pointer' }}
             onClick={() => {
-              console.info(router);
               router.push(`/form/${selectedWorkspaceId}/${params.id}`);
             }}
           >{`localhost:8083/form/${selectedWorkspaceId}/${params.id}`}</Button>

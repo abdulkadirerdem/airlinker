@@ -25,6 +25,7 @@ export interface AirlinkAPI {
 }
 
 export interface QuestionType {
+  required: boolean;
   _id?: any;
   title: string;
   type: string;

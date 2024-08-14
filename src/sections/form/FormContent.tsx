@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
 import {
   Box,
   Radio,
   Paper,
+  Alert,
   Button,
   Checkbox,
+  Snackbar,
   TextField,
   Typography,
   RadioGroup,
@@ -19,6 +21,7 @@ import {
 import { usePathname } from 'src/routes/hooks';
 
 import { QuestionType } from 'src/constants/types';
+import { submitForm } from 'src/api/form/submitForm';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
 
 // ----------------------------------------------------------------------
@@ -32,8 +35,13 @@ export default function FormContent() {
   const workspaceId = pathname.split('/')[2];
   const airlinkId = pathname.split('/')[3];
   const [answers, setAnswers] = useState<{ [key: string]: string | string[] }>({});
+  const [error, setError] = useState<string | null>(null);
 
-  const { data, error, isLoading } = useQuery({
+  const {
+    data,
+    error: queryError,
+    isLoading,
+  } = useQuery({
     queryKey: ['airlinks'],
     queryFn: async () => {
       const result = await getAllAirlinksByWorkspace(workspaceId);
@@ -41,14 +49,40 @@ export default function FormContent() {
     },
   });
 
-  if (error) {
+  const { isPending, mutateAsync } = useMutation({
+    mutationKey: ['submit-form'],
+    mutationFn: submitForm,
+  });
+
+  if (queryError) {
     return <p style={{ padding: 5 }}>Something went wrong!</p>;
   }
 
   const formData: any =
     !isLoading && data !== undefined ? data.filter((item) => item?._id === airlinkId)[0] : [];
 
-  console.info(!isLoading ? data : []);
+  const validateForm = (): boolean => {
+    const { questions } = formData.form;
+
+    const hasError = questions.some((question: QuestionType) => {
+      const answer = answers[question._id];
+
+      // Eğer sorunun yanıtı eksikse
+      if (
+        question.required &&
+        (answer === undefined || answer === '' || (Array.isArray(answer) && answer.length === 0))
+      ) {
+        setError(`Question "${question.title}" is required.`);
+        return true;
+      }
+      return false;
+    });
+
+    if (!hasError) {
+      setError(null);
+    }
+    return !hasError;
+  };
 
   const handleInputChange = (questionId: string, value: string | string[]) => {
     setAnswers((prev) => ({
@@ -57,9 +91,22 @@ export default function FormContent() {
     }));
   };
 
-  const handleSubmit = () => {
-    console.info('Form Responses:', answers);
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      console.log('Errrrrrr');
+      return; // Eğer doğrulama başarısızsa gönderim işlemini durdur
+    }
+
+    try {
+      await mutateAsync({ id: formData.form._id, data: answers });
+      // Başarılı işlem sonrası yapılacaklar
+      console.log('Form submitted successfully');
+    } catch (err) {
+      console.error('Error submitting form:', err);
+    }
   };
+
+  if (isLoading) return 'Loading...';
 
   return (
     <Paper elevation={12} sx={{ p: 2, px: 4, mt: 4 }}>
@@ -140,6 +187,13 @@ export default function FormContent() {
           </Button>
         </Box>
       </Box>
+
+      {/* Error Snackbar */}
+      <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={() => setError(null)}>
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }
