@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { Stack, Button, TextField, Typography } from '@mui/material';
 
 interface Component {
   type: string;
@@ -40,6 +40,15 @@ export default function FormBuilder({
       newComponents[index].options![optionIndex] = value;
     }
     setComponents(newComponents);
+  };
+
+  const saveForm = () => {
+    const form = {
+      title,
+      description,
+      components,
+    };
+    console.log('Form saved:', form);
   };
 
   return (
@@ -104,7 +113,6 @@ export default function FormBuilder({
                   onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                 />
               ))}
-            {/* Eğer radio veya multiple-choice ise, yeni seçenek ekleme butonu */}
             {(component.type === 'radio' || component.type === 'multiple-choice') &&
               component.options &&
               component.options.length < 5 && (
@@ -122,6 +130,11 @@ export default function FormBuilder({
           </Stack>
         ))}
       </Stack>
+
+      {/* Save Form Button */}
+      <Button variant="contained" color="primary" onClick={saveForm}>
+        Save Form
+      </Button>
     </Stack>
   );
 }
