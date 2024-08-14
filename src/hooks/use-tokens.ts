@@ -17,7 +17,6 @@ export default function useTokens(walletPublicKey: PublicKey | null): Token[] {
       const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
         programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
       });
-      console.log('🚀 ~ fetchTokens ~ tokenAccounts:', tokenAccounts);
 
       const tokenData = tokenAccounts.value.map((account) => ({
         mintAddress: account.account.data.parsed.info.mint,

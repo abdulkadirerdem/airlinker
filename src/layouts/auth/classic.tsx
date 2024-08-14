@@ -65,13 +65,13 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
       }}
     >
       <Typography variant="h3" sx={{ maxWidth: 480, textAlign: 'center' }}>
-        {title || 'Hi, Welcome back'}
+        {title || 'Hi, Welcome to AirLinker'}
       </Typography>
 
       <Box
         component="img"
         alt="auth"
-        src={image || '/assets/illustrations/illustration_dashboard.png'}
+        src={image || '/assets/images/logo/thumbs-up-airy.png'}
         sx={{
           maxWidth: {
             xs: 480,

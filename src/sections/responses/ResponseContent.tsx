@@ -46,10 +46,10 @@ export default function ResponseContent() {
         Airlinker
       </Typography>
       <Typography variant="h4" gutterBottom>
-        {formData.form.title}
+        {formData.title}
       </Typography>
       <Typography variant="subtitle1" gutterBottom>
-        {formData.form.description}
+        {formData.description}
       </Typography>
     </Paper>
   );

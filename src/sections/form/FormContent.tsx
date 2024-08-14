@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import {
   Box,
@@ -108,16 +109,18 @@ export default function FormContent() {
 
   if (isLoading) return 'Loading...';
 
+  console.log('🚀 ~ FormContent ~ formData:', formData);
+
   return (
     <Paper elevation={12} sx={{ p: 2, px: 4, mt: 4 }}>
       <Typography variant="h3" gutterBottom textAlign="right">
         Airlinker
       </Typography>
       <Typography variant="h4" gutterBottom>
-        {formData.form.title}
+        {formData.title}
       </Typography>
       <Typography variant="subtitle1" gutterBottom>
-        {formData.form.description}
+        {formData.description}
       </Typography>
       <Box
         component="form"
@@ -179,6 +182,7 @@ export default function FormContent() {
                 onChange={(e) => handleInputChange(question._id, e.target.value)}
               />
             )}
+            {question.type === 'connect-wallet' && <WalletMultiButton />}
           </FormControl>
         ))}
         <Box mt={4}>

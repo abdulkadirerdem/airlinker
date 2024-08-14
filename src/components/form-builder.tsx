@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
@@ -117,7 +117,7 @@ export default function FormBuilder({
 
     // Check each component for validity
     const invalidComponent = components.find((component) => {
-      if (!component.label.trim()) {
+      if (component.type !== 'connect-wallet' && !component.label.trim()) {
         setError('All question labels must be filled.');
         return true;
       }
@@ -153,12 +153,16 @@ export default function FormBuilder({
   };
 
   const saveForm = () => {
+    console.log('🚀 ~ saveForm ~ components:', components);
+
     if (validateForm()) {
       const form = {
         title,
         description,
         questions: components.map((item) =>
-          Object({ type: item.type, options: item.options, title: item.label })
+          item.type === 'connect-wallet'
+            ? Object({ type: item.type, title: 'Connect Wallet', options: [] })
+            : Object({ type: item.type, options: item.options, title: item.label })
         ),
       };
 
@@ -168,7 +172,8 @@ export default function FormBuilder({
         type: 'form',
         workspace: workspaceId,
       }).then((item: any) => {
-        toast.success('Airlink created!', { duration: 2000 });
+        console.log('🚀 ~ saveForm ~ item:', item);
+        // toast.success('Airlink created!', { duration: 2000 });
         // const airlinkId = item._id.toString();
 
         formMutateAsync({
