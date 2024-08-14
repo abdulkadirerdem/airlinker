@@ -1,9 +1,19 @@
 import { Box, Stack, Button, Divider, Typography } from '@mui/material';
 
 const widgets = [
-  { type: 'radio', label: 'Radio Button', defaultOptions: ['Option 1', 'Option 2'] },
-  { type: 'multiple-choice', label: 'Multiple Choice', defaultOptions: ['Option 1', 'Option 2'] },
-  { type: 'text', label: 'Text Field' },
+  {
+    type: 'radio',
+    label: 'Radio Button',
+    defaultOptions: ['Option 1', 'Option 2'],
+    color: 'info',
+  },
+  {
+    type: 'multiple-choice',
+    label: 'Multiple Choice',
+    defaultOptions: ['Option 1', 'Option 2'],
+    color: 'error',
+  },
+  { type: 'text', label: 'Text Field', color: 'warning' },
 ];
 
 export default function WidgetPanel({
@@ -24,7 +34,7 @@ export default function WidgetPanel({
             key={widget.type}
             onClick={() => onSelect(widget.type, widget.defaultOptions)}
             variant="contained"
-            color="warning"
+            color={widget.color}
           >
             {widget.label}
           </Button>

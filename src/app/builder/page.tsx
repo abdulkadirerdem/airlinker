@@ -18,12 +18,14 @@ export default function Page() {
     <Container maxWidth="xl">
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
-          <Paper elevation={4} sx={{ height: 300 }}>
+          <Paper elevation={2} sx={{ height: 300 }}>
             <WidgetPanel onSelect={setSelectedType} />
           </Paper>
         </Stack>
         <Stack flex={4}>
-          <FormBuilder selectedType={selectedType} onWidgetAdded={handleWidgetAdded} />
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <FormBuilder selectedType={selectedType} onWidgetAdded={handleWidgetAdded} />
+          </Paper>
         </Stack>
         <Stack flex={2} />
       </Stack>
