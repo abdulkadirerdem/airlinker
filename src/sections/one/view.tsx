@@ -1,20 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import Container from '@mui/material/Container';
-import { Grid, Paper, Button, useTheme } from '@mui/material';
+import { Grid, Paper, Button, useTheme, Stack } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
+import { createWorkspace } from 'src/api/workspace/createWorkspace';
 import { getAllWorkspaces } from 'src/api/workspace/getAllWorkspaces';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
 
 import MenuView from 'src/components/menu-view';
 import DataGridTable from 'src/components/data-grid';
 import { useSettingsContext } from 'src/components/settings';
+import AddWorkspaceModal from 'src/components/add-workspace-modal';
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +25,18 @@ export default function OneView() {
   const theme = useTheme();
   const settings = useSettingsContext();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const { data, error, isLoading } = useQuery({
+
+  const { isPending, mutateAsync } = useMutation({
+    mutationKey: ['create-workspace'],
+    mutationFn: createWorkspace,
+  });
+
+  const {
+    data,
+    error,
+    isLoading,
+    refetch: WorkspaceRefetch,
+  } = useQuery({
     queryKey: ['workspaces'],
     queryFn: async () => {
       const result = await getAllWorkspaces();
@@ -58,12 +71,19 @@ export default function OneView() {
       {isLoading ? (
         'Loading...'
       ) : (
-        <MenuView
-          data={data}
-          error={error}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-        />
+        <Stack direction="row" width="100%">
+          <MenuView
+            data={data}
+            error={error}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+          />
+          <AddWorkspaceModal
+            isPending={isPending}
+            mutateAsync={mutateAsync}
+            WorkspaceRefetch={WorkspaceRefetch}
+          />
+        </Stack>
       )}
 
       <Grid container mb={4} columnGap={3}>
@@ -84,7 +104,7 @@ export default function OneView() {
               fontWeight: 500,
             }}
             onClick={() => {
-              router.push(paths.builder.root);
+              router.push(`${paths.builder.root}/${selectedWorkspaceId}`);
             }}
           >
             <span style={{ fontWeight: 700, marginRight: 6, fontSize: 28 }}>+</span> Create New Form

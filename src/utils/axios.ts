@@ -51,4 +51,8 @@ export const endpoints = {
     getAirlinksByWorkstations: '/workspace/airlinks',
     addAirlink: '/airlinks',
   },
+
+  forms: {
+    addForm: '/forms',
+  },
 };

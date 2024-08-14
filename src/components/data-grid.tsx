@@ -72,6 +72,7 @@ type Props = {
         type: string;
         title: string;
         description: string;
+        createdAt: string;
       }[]
     | undefined;
   error: any;
@@ -86,7 +87,13 @@ export default function DataGridTable({ data, error }: Props) {
     <Box sx={{ width: '100%' }}>
       <DataGrid
         columns={columns}
-        rows={data ? data.map((item) => Object({ ...item, id: item._id })) : []}
+        rows={
+          data
+            ? data
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .map((item) => Object({ ...item, id: item._id }))
+            : []
+        }
         disableRowSelectionOnClick
       />
     </Box>
