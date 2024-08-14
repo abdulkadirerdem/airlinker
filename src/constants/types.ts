@@ -7,19 +7,19 @@ export interface WorkspaceAPI {
 }
 
 export interface AirlinkAPI {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
   type: string;
-  form: string;
+  form?: string;
   workspace: string;
 }
 
 export interface FormAPI {
-  _id: string;
+  _id?: string;
   title: string;
   description: string;
   questions: Array<{ title: string; type: string; options: Array<string> }>;
-  responses: [string];
+  responses?: [string];
   airlink: string;
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 import {
   Stack,
@@ -12,7 +13,14 @@ import {
   IconButton,
 } from '@mui/material';
 
+import { useRouter } from 'src/routes/hooks';
+
+import { createForm } from 'src/api/form/createForm';
+import { createAirlink } from 'src/api/airlink/createAirlink';
+
 import Iconify from 'src/components/iconify';
+import toast from 'react-hot-toast';
+import { paths } from 'src/routes/paths';
 
 interface Component {
   type: string;
@@ -23,10 +31,13 @@ interface Component {
 export default function FormBuilder({
   selectedType,
   onWidgetAdded,
+  workspaceId,
 }: {
   selectedType: string | null;
   onWidgetAdded: () => void;
+  workspaceId: string;
 }) {
+  const router = useRouter();
   const theme = useTheme();
   const [components, setComponents] = useState<Component[]>([]);
   const [title, setTitle] = useState<string>('Form Title');
@@ -34,6 +45,20 @@ export default function FormBuilder({
   const [description, setDescription] = useState<string>('Form Description');
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state for validation messages
+
+  const { mutateAsync } = useMutation({
+    mutationKey: ['create-airlink'],
+    mutationFn: createAirlink,
+  });
+
+  const {
+    data: createdFormData,
+    isPending: isFormCreated,
+    mutateAsync: formMutateAsync,
+  } = useMutation({
+    mutationKey: ['create-form'],
+    mutationFn: createForm,
+  });
 
   useEffect(() => {
     if (selectedType) {
@@ -78,6 +103,11 @@ export default function FormBuilder({
   };
 
   const validateForm = (): boolean => {
+    if (components?.length === 0) {
+      setError('Add some questions.');
+      return false;
+    }
+
     // Check if title and description are not empty
     if (!title.trim() || !description.trim()) {
       setError('Title and Description cannot be empty.');
@@ -124,8 +154,29 @@ export default function FormBuilder({
       const form = {
         title,
         description,
-        components,
+        questions: components.map((item) =>
+          Object({ type: item.type, options: item.options, title: item.label })
+        ),
       };
+
+      mutateAsync({
+        description: form.description,
+        title: form.title,
+        type: 'form',
+        workspace: workspaceId,
+      }).then((item) => {
+        toast.success('Airlink created!', { duration: 2000 });
+
+        formMutateAsync({
+          description: form.description,
+          title: form.title,
+          airlink: item._id,
+          questions: form.questions,
+        }).then((createdForm) => {
+          toast.success('Form created!', { duration: 2000 });
+          return router.push(paths.dashboard.root);
+        });
+      });
       console.log('Form saved:', form);
     }
   };

@@ -14,6 +14,7 @@ import { SettingsDrawer, SettingsProvider } from 'src/components/settings';
 
 import { AuthProvider } from 'src/auth/context/jwt';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
 
 // ----------------------------------------------------------------------
 
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: Props) {
                   <SettingsDrawer />
                   <ProgressBar />
                   {children}
+                  <Toaster />
                 </MotionLazy>
               </ThemeProvider>
             </SettingsProvider>

@@ -17,8 +17,8 @@ export default function Layout({ children }: Props) {
 
   return (
     <AuthGuard>
-      {renderHorizontal}
-      <Box height={75} />
+      {/* {renderHorizontal} */}
+      {/* <Box mt={10}>Builder</Box> */}
       <DashboardLayout>{children}</DashboardLayout>
     </AuthGuard>
   );

@@ -51,7 +51,7 @@ export function useNavData() {
       {
         subheader: 'Product Tracking',
         items: [
-          { title: 'Builder', path: paths.builder.root },
+          { title: 'Builder', path: '/' },
           { title: 'Responses', path: paths.responses.root },
           {
             title: 'Settings',

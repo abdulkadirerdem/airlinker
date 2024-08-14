@@ -84,7 +84,7 @@ export default function OneView() {
               fontWeight: 500,
             }}
             onClick={() => {
-              router.push(paths.builder.root);
+              router.push(`${paths.builder.root}/${selectedWorkspaceId}`);
             }}
           >
             <span style={{ fontWeight: 700, marginRight: 6, fontSize: 28 }}>+</span> Create New Form
