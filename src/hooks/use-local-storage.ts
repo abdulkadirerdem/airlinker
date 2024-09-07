@@ -11,6 +11,7 @@ export function useLocalStorage(key: string, initialState: any) {
     if (restored) {
       setState((prevValue: any) => ({
         ...prevValue,
+        // @ts-ignore
         ...restored,
       }));
     }
