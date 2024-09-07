@@ -19,8 +19,10 @@ const Label = forwardRef<HTMLSpanElement, LabelProps>(
     };
 
     return (
+      
       <StyledLabel
         ref={ref}
+        // @ts-ignore
         component="span"
         ownerState={{ color, variant }}
         sx={{
