@@ -17,7 +17,7 @@ export default function Page() {
   const lgUp = useResponsive('up', 'lg');
 
   const handleWidgetAdded = () => {
-    setSelectedType(null); // Widget eklendikten sonra seçimi temizle
+    setSelectedType(null);
   };
 
   return (
@@ -33,7 +33,7 @@ export default function Page() {
             height: 85,
             mr: 2.5,
             position: 'absolute',
-            top: 67,
+            top: 62,
             left: 220,
             zIndex: 9,
           }}

@@ -36,6 +36,7 @@ export const endpoints = {
     register: '/auth/register',
     logout: '/auth/logout',
   },
+
   products: {
     getAllProducts: '/products',
     addProduct: '/add-product',
@@ -54,5 +55,26 @@ export const endpoints = {
 
   forms: {
     addForm: '/forms',
+    submitForm: (id: string | number) => `/forms/${id}/responses`,
+  },
+
+  quizzes: {
+    addQuiz: '/quizzes',
+    getQuizzes: '/quizzes',
+    getQuizById: (id: string | number) => `/quizzes/${id}`,
+    updateQuiz: (id: string | number) => `/quizzes/${id}`,
+    deleteQuiz: (id: string | number) => `/quizzes/${id}`,
+    submitQuizResponse: (quizId: string | number) => `/quizzes/${quizId}/submit`,
+    submitQuiz: (id: string | number) => `/quizzes/${id}/submit`,
+  },
+
+  raffles: {
+    addRaffle: '/raffles',
+    getRaffles: '/raffles',
+    getRaffleById: (id: string | number) => `/raffles/${id}`,
+    updateRaffle: (id: string | number) => `/raffles/${id}`,
+    deleteRaffle: (id: string | number) => `/raffles/${id}`,
+    submitRaffle: (id: string | number) => `/raffles/${id}/participants`,
+    drawWinner: (raffleId: string | number) => `/raffles/${raffleId}/draw`,
   },
 };

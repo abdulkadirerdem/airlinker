@@ -30,6 +30,9 @@ export const paths = {
   },
   builder: {
     root: '/builder',
+    form: '/builder/form',
+    quiz: '/builder/quiz',
+    raffle: '/builder/raffle',
   },
   responses: {
     root: '/responses',

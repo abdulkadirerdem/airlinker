@@ -43,7 +43,7 @@ export default function Header({ onOpenNav }: Props) {
           AirLinker
         </p>
       )} */}
-      {lgUp && isNavHorizontal && (
+      {lgUp && (
         <Link component="a" href="/">
           <Box
             component="img"
@@ -82,32 +82,39 @@ export default function Header({ onOpenNav }: Props) {
   );
 
   return (
-    <AppBar
+    // <AppBar
+    //   sx={{
+    //     height: HEADER.H_MOBILE,
+    //     zIndex: theme.zIndex.appBar + 1,
+    //     ...bgBlur({
+    //       color: theme.palette.background.default,
+    //     }),
+    //     transition: theme.transitions.create(['height'], {
+    //       duration: theme.transitions.duration.shorter,
+    //     }),
+    //     ...(lgUp && {
+    //       width: `calc(100% - ${NAV.W_VERTICAL + 1}px)`,
+    //       height: HEADER.H_DESKTOP,
+    //       ...(offsetTop && {
+    //         height: HEADER.H_DESKTOP_OFFSET,
+    //       }),
+    //       ...(isNavHorizontal && {
+    //         width: 1,
+    //         bgcolor: 'background.default',
+    //         height: HEADER.H_DESKTOP_OFFSET,
+    //         borderBottom: `solid 1px ${theme.palette.divider}`,
+    //       }),
+    //       ...(isNavMini && {
+    //         width: `calc(100% - ${NAV.W_MINI + 1}px)`,
+    //       }),
+    //     }),
+    //   }}
+    // >
+    <Box
       sx={{
         height: HEADER.H_MOBILE,
         zIndex: theme.zIndex.appBar + 1,
-        ...bgBlur({
-          color: theme.palette.background.default,
-        }),
-        transition: theme.transitions.create(['height'], {
-          duration: theme.transitions.duration.shorter,
-        }),
-        ...(lgUp && {
-          width: `calc(100% - ${NAV.W_VERTICAL + 1}px)`,
-          height: HEADER.H_DESKTOP,
-          ...(offsetTop && {
-            height: HEADER.H_DESKTOP_OFFSET,
-          }),
-          ...(isNavHorizontal && {
-            width: 1,
-            bgcolor: 'background.default',
-            height: HEADER.H_DESKTOP_OFFSET,
-            borderBottom: `solid 1px ${theme.palette.divider}`,
-          }),
-          ...(isNavMini && {
-            width: `calc(100% - ${NAV.W_MINI + 1}px)`,
-          }),
-        }),
+        bgcolor: theme.palette.primary.lighter,
       }}
     >
       <Toolbar
@@ -118,6 +125,7 @@ export default function Header({ onOpenNav }: Props) {
       >
         {renderContent}
       </Toolbar>
-    </AppBar>
+    </Box>
+    // </AppBar>
   );
 }
