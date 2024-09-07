@@ -1,7 +1,5 @@
 import { useFormik } from 'formik';
-import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import {
@@ -14,60 +12,35 @@ import {
   TextField,
   Typography,
   IconButton,
+  Checkbox,
+  Radio,
 } from '@mui/material';
 
-import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
-
-import { createForm } from 'src/api/form/createForm';
-import { createAirlink } from 'src/api/airlink/createAirlink';
 
 import Iconify from 'src/components/iconify';
+import { FormValues } from 'src/constants/types';
 
-interface Component {
-  type: string;
-  label: string;
-  options?: string[];
-}
 
-interface FormValues {
-  title: string;
-  description: string;
-  components: Component[];
-}
 
 interface FormBuilderProps {
   formik: ReturnType<typeof useFormik<FormValues>>;
   selectedType: string | null;
   onWidgetAdded: (type: string, options?: string[]) => void;
-  workspaceId: string;
+  formType?: string;
 }
 
 export default function FormBuilder({
   formik,
   selectedType,
   onWidgetAdded,
-  workspaceId,
+  formType,
 }: FormBuilderProps) {
-  const router = useRouter();
   const theme = useTheme();
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state for validation messages
 
-  const { mutateAsync } = useMutation({
-    mutationKey: ['create-airlink'],
-    mutationFn: createAirlink,
-  });
 
-  const {
-    data: createdFormData,
-    isPending: isFormCreated,
-    mutateAsync: formMutateAsync,
-  } = useMutation({
-    mutationKey: ['create-form'],
-    mutationFn: createForm,
-  });
 
   useEffect(() => {
     if (selectedType) {
@@ -106,91 +79,10 @@ export default function FormBuilder({
     formik.setFieldValue('components', newComponents);
   };
 
-  const validateForm = (): boolean => {
-    if (formik.values.components?.length === 0) {
-      setError('Add some questions.');
-      return false;
-    }
 
-    // Check if title and description are not empty
-    if (!formik.values.title.trim() || !formik.values.description.trim()) {
-      setError('Title and Description cannot be empty.');
-      return false;
-    }
-
-    // Check each component for validity
-    const invalidComponent = formik.values.components.find((component) => {
-      if (component.type !== 'connect-wallet' && !component.label.trim()) {
-        setError('All question labels must be filled.');
-        return true;
-      }
-
-      if (
-        (component.type === 'radio' || component.type === 'multiple-choice') &&
-        (!component.options || component.options.some((option) => !option.trim()))
-      ) {
-        setError('All options must be filled.');
-        return true;
-      }
-
-      if (
-        (component.type === 'radio' || component.type === 'multiple-choice') &&
-        (component.options === undefined ||
-          component.options?.length < 2 ||
-          component.options?.length > 5)
-      ) {
-        setError('Options must be between 2 and 5.');
-        return true;
-      }
-
-      return false;
-    });
-
-    if (invalidComponent) {
-      return false;
-    }
-
-    // No errors
-    setError(null);
-    return true;
-  };
 
   const saveForm = () => {
     formik.handleSubmit();
-
-    if (validateForm()) {
-      const form = {
-        title: formik.values.title,
-        description: formik.values.description,
-        questions: formik.values.components.map((item) =>
-          item.type === 'connect-wallet'
-            ? Object({ type: item.type, title: 'Connect Wallet', options: [] })
-            : Object({ type: item.type, options: item.options, title: item.label })
-        ),
-      };
-
-      mutateAsync({
-        description: form.description,
-        title: form.title,
-        type: 'form',
-        workspace: workspaceId,
-      }).then((item: any) => {
-        console.log('🚀 ~ saveForm ~ item:', item);
-        // toast.success('Airlink created!', { duration: 2000 });
-        // const airlinkId = item._id.toString();
-
-        formMutateAsync({
-          description: form.description,
-          title: form.title,
-          airlink: item._id,
-          questions: form.questions,
-        }).then((createdForm) => {
-          toast.success('Form created!', { duration: 2000 });
-          return router.push(paths.dashboard.root);
-        });
-      });
-      console.log('Form saved:', form);
-    }
   };
 
   return (
@@ -301,11 +193,49 @@ export default function FormBuilder({
                           value={option}
                           onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                         />
+
+                        {/* Correct Answer Selection for Radio */}
+                        {component.type === 'radio' && formType === 'quiz' && (
+                          <Radio
+                            checked={component.correctAnswer === option}
+                            onChange={() => {
+                              const newComponents = [...formik.values.components];
+                              newComponents[index].correctAnswer = option; // Only one correct answer
+                              formik.setFieldValue('components', newComponents);
+                            }}
+                          />
+                        )}
+
+                        {/* Correct Answer Selection for Multiple Choice */}
+                        {component.type === 'multiple-choice' && formType === 'quiz' && (
+                          <Checkbox
+                            checked={component.correctAnswer?.includes(option)}
+                            onChange={(e) => {
+                              const newComponents = [...formik.values.components];
+                              if (!newComponents[index].correctAnswer) {
+                                newComponents[index].correctAnswer = [];
+                              }
+                              if (e.target.checked) {
+                                // Add the selected answer
+                                newComponents[index].correctAnswer!.push(option);
+                              } else {
+                                // Remove the unselected answer
+                                newComponents[index].correctAnswer = newComponents[index].correctAnswer!.filter(
+                                  (answer: string) => answer !== option
+                                );
+                              }
+                              formik.setFieldValue('components', newComponents);
+                            }}
+                          />
+                        )}
+
                         <IconButton onClick={() => removeOption(index, optionIndex)}>
                           <Iconify icon="solar:close-circle-bold" />
                         </IconButton>
                       </Stack>
                     ))}
+
+
                   {(component.type === 'radio' || component.type === 'multiple-choice') &&
                     component.options &&
                     component.options.length < 5 && (
@@ -320,6 +250,22 @@ export default function FormBuilder({
                         Add New Option
                       </Button>
                     )}
+                  {formType === 'quiz' && component.type === "text" && (
+                    <TextField
+                      label="Correct Answer"
+                      variant="outlined"
+                      fullWidth
+                      value={component.correctAnswer || ''}
+                      onChange={(e) => {
+                        const newComponents = [...formik.values.components];
+                        newComponents[index].correctAnswer = e.target.value;
+                        formik.setFieldValue('components', newComponents);
+                      }}
+                      sx={{ mt: 1 }}
+                    />
+                  )}
+
+
                 </>
               ) : (
                 <WalletMultiButton />
