@@ -126,8 +126,8 @@ export function palette(mode: 'light' | 'dark') {
       disabled: grey[500],
     },
     background: {
-      paper: '#FFFFFF',
-      default: grey[0],
+      paper: common.white,
+      default: common.white,
       neutral: grey[200],
     },
     action: {

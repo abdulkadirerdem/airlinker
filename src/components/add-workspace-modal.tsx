@@ -41,7 +41,6 @@ export default function AddWorkspaceModal({
       <Button
         variant="contained"
         sx={{ marginLeft: 'auto', mt: 1, borderRadius: 0.5 }}
-        size="small"
         color="primary"
         onClick={handleOpen}
       >

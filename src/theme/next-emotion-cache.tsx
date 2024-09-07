@@ -64,6 +64,7 @@ export default function NextAppDirEmotionCacheProvider(props: NextAppDirEmotionC
 
       if (typeof style !== 'boolean') {
         if (isGlobal) {
+          // @ts-ignore
           globals.push({ name, style });
         } else {
           styles += style;

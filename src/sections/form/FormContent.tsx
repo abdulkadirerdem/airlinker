@@ -19,13 +19,12 @@ import {
   FormControlLabel,
 } from '@mui/material';
 
-import { useRouter } from 'src/routes/hooks';
-import { usePathname } from 'src/routes/hooks';
+import { paths } from 'src/routes/paths';
+import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { QuestionType } from 'src/constants/types';
 import { submitForm } from 'src/api/form/submitForm';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
-import { paths } from 'src/routes/paths';
 
 // ----------------------------------------------------------------------
 

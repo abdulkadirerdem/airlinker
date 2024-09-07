@@ -11,14 +11,14 @@ import Iconify from 'src/components/iconify';
 
 type Props = {
   data:
-    | {
-        _id: string;
-        type: string;
-        title: string;
-        description: string;
-        createdAt: string;
-      }[]
-    | undefined;
+  | {
+    _id?: string;
+    type: string;
+    title: string;
+    description: string;
+    createdAt?: string;
+  }[]
+  | undefined;
   error: any;
   selectedWorkspaceId: string | undefined;
 };
@@ -123,8 +123,11 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         rows={
           data
             ? data
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .map((item) => Object({ ...item, id: item._id }))
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
+              )
+              .map((item) => Object({ ...item, id: item._id }))
             : []
         }
         disableRowSelectionOnClick

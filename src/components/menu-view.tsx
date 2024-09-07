@@ -26,7 +26,7 @@ export default function MenuView({
   }
 
   return (
-    <Box width="fit-content" mb={2} minWidth={250}>
+    <Box width="fit-content" mb={2} mt={2} minWidth={250}>
       <FormControl fullWidth>
         <InputLabel id="select-label">Workspaces</InputLabel>
         <Select
@@ -35,6 +35,7 @@ export default function MenuView({
           }}
           labelId="select-label"
           id="select"
+          size="small"
           value={selectedIndex}
           onChange={handleChange}
           label="Workspaces"

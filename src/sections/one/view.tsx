@@ -1,10 +1,11 @@
 'use client';
 
+import { Icon } from '@iconify/react';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 import Container from '@mui/material/Container';
-import { Box, Grid, Paper, Stack, Button, useTheme } from '@mui/material';
+import { Box, Grid, Paper, Stack, Button, useTheme, Typography } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -76,9 +77,9 @@ export default function OneView() {
             height: 88,
             mr: 2.5,
             position: 'absolute',
-            top: 67,
+            top: 86,
             right: 270,
-            zIndex: 9,
+            zIndex: 1300,
             transform: 'scaleX(-1)',
           }}
         />
@@ -86,7 +87,7 @@ export default function OneView() {
       {isLoading ? (
         'Loading...'
       ) : (
-        <Stack direction="row" width="100%">
+        <Stack direction="row" width="100%" alignItems="center">
           <MenuView
             data={data}
             error={error}
@@ -101,91 +102,86 @@ export default function OneView() {
         </Stack>
       )}
 
-      <Grid container mb={4} columnGap={3}>
-        <Grid item xs={4.05}>
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={4}>
           <Paper
             component={Button}
             fullWidth
-            elevation={8}
+            elevation={2}
             sx={{
               height: 100,
               borderRadius: 0.5,
               border: '1px solid grey',
               p: 2,
               display: 'flex',
+              flexDirection: 'column',
               textAlign: 'center',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 500,
             }}
             onClick={() => {
-              router.push(`${paths.builder.root}/${selectedWorkspaceId}`);
+              router.push(`${paths.builder.form}/${selectedWorkspaceId}`);
             }}
           >
-            <span style={{ fontWeight: 700, marginRight: 6, fontSize: 28 }}>+</span> Create New Form
+            <Icon icon="mdi:form-outline" fontSize={40} />
+            <Typography fontSize={14} fontWeight="600">
+              Form
+            </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={2.45}>
+        <Grid item xs={12} sm={4}>
           <Paper
             component={Button}
             fullWidth
-            elevation={8}
+            elevation={2}
             sx={{
               height: 100,
               borderRadius: 0.5,
               border: '1px solid grey',
               p: 2,
               display: 'flex',
+              flexDirection: 'column',
               textAlign: 'center',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 500,
-              background: theme.palette.success.lighter,
+            }}
+            onClick={() => {
+              router.push(`${paths.builder.quiz}/${selectedWorkspaceId}`);
             }}
           >
-            Create New Game
+            <Icon icon="mdi:quiz-outline" fontSize={40} />
+            <Typography fontSize={14} fontWeight="600">
+              Quiz
+            </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={2.45}>
+        <Grid item xs={12} sm={4}>
           <Paper
             component={Button}
             fullWidth
-            elevation={8}
+            elevation={2}
             sx={{
               height: 100,
               borderRadius: 0.5,
               border: '1px solid grey',
               p: 2,
               display: 'flex',
+              flexDirection: 'column',
               textAlign: 'center',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 500,
-              background: theme.palette.info.lighter,
+            }}
+            onClick={() => {
+              router.push(`${paths.builder.raffle}/${selectedWorkspaceId}`);
             }}
           >
-            Template 1
-          </Paper>
-        </Grid>
-        <Grid item xs={2.45}>
-          <Paper
-            component={Button}
-            fullWidth
-            elevation={8}
-            sx={{
-              height: 100,
-              borderRadius: 0.5,
-              border: '1px solid grey',
-              p: 2,
-              display: 'flex',
-              textAlign: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 500,
-              background: theme.palette.error.lighter,
-            }}
-          >
-            Template 2
+            <Icon icon="fad:random-2dice" fontSize={45} />
+            <Typography fontSize={14} fontWeight="600">
+              Raffle
+            </Typography>
           </Paper>
         </Grid>
       </Grid>
