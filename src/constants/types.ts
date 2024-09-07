@@ -21,7 +21,7 @@ export interface QuizAPI {
   description: string;
   questions: Array<{
     title: string;
-    type: 'radio' | 'multiple-choice' | 'text';
+    type: string;
     options: Array<string>;
     correctAnswer?: string;
   }>;
@@ -35,7 +35,7 @@ export interface RaffleAPI {
   description: string;
   participationInformation: Array<{
     title: string;
-    type: 'radio' | 'multiple-choice' | 'text' | 'connect-wallet';
+    type: string;
     options: Array<string>;
   }>;
   participants?: Array<{ answers: Array<any> }>;

@@ -1,3 +1,4 @@
+import { useFormik } from 'formik';
 import { toast } from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
@@ -29,21 +30,28 @@ interface Component {
   options?: string[];
 }
 
+interface FormValues {
+  title: string;
+  description: string;
+  components: Component[];
+}
+
+interface FormBuilderProps {
+  formik: ReturnType<typeof useFormik<FormValues>>;
+  selectedType: string | null;
+  onWidgetAdded: (type: string, options?: string[]) => void;
+  workspaceId: string;
+}
+
 export default function FormBuilder({
+  formik,
   selectedType,
   onWidgetAdded,
   workspaceId,
-}: {
-  selectedType: string | null;
-  onWidgetAdded: () => void;
-  workspaceId: string;
-}) {
+}: FormBuilderProps) {
   const router = useRouter();
   const theme = useTheme();
-  const [components, setComponents] = useState<Component[]>([]);
-  const [title, setTitle] = useState<string>('Form Title');
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>('Form Description');
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state for validation messages
 
@@ -63,60 +71,55 @@ export default function FormBuilder({
 
   useEffect(() => {
     if (selectedType) {
-      addComponent(selectedType);
-      onWidgetAdded(); // Notify parent when a widget is added
+      onWidgetAdded(selectedType);
     }
   }, [onWidgetAdded, selectedType]);
 
-  const addComponent = (type: string) => {
-    const newComponent: Component = { type, label: '', options: type === 'text' ? [] : ['', ''] };
-    setComponents((prevComponents) => [...prevComponents, newComponent]);
-  };
-
-  const handleOptionChange = (index: number, optionIndex: number, value: string) => {
-    const newComponents = [...components];
-    if (newComponents[index].options) {
-      newComponents[index].options![optionIndex] = value;
-    }
-    setComponents(newComponents);
-  };
-
   const removeComponent = (index: number) => {
-    setComponents((prevComponents) => prevComponents.filter((_, i) => i !== index));
+    const newComponents = formik.values.components.filter((_, i) => i !== index);
+    formik.setFieldValue('components', newComponents);
+  };
+
+  const handleOptionChange = (componentIndex: number, optionIndex: number, value: string) => {
+    const newComponents = [...formik.values.components];
+    if (newComponents[componentIndex].options) {
+      newComponents[componentIndex].options![optionIndex] = value;
+      formik.setFieldValue('components', newComponents);
+    }
   };
 
   const removeOption = (componentIndex: number, optionIndex: number) => {
-    const newComponents = [...components];
+    const newComponents = [...formik.values.components];
     if (newComponents[componentIndex].options) {
       newComponents[componentIndex].options = newComponents[componentIndex].options!.filter(
         (_, i) => i !== optionIndex
       );
+      formik.setFieldValue('components', newComponents);
     }
-    setComponents(newComponents);
   };
 
   const moveComponent = (index: number, direction: 'up' | 'down') => {
-    const newComponents = [...components];
+    const newComponents = [...formik.values.components];
     const [movedComponent] = newComponents.splice(index, 1);
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     newComponents.splice(newIndex, 0, movedComponent);
-    setComponents(newComponents);
+    formik.setFieldValue('components', newComponents);
   };
 
   const validateForm = (): boolean => {
-    if (components?.length === 0) {
+    if (formik.values.components?.length === 0) {
       setError('Add some questions.');
       return false;
     }
 
     // Check if title and description are not empty
-    if (!title.trim() || !description.trim()) {
+    if (!formik.values.title.trim() || !formik.values.description.trim()) {
       setError('Title and Description cannot be empty.');
       return false;
     }
 
     // Check each component for validity
-    const invalidComponent = components.find((component) => {
+    const invalidComponent = formik.values.components.find((component) => {
       if (component.type !== 'connect-wallet' && !component.label.trim()) {
         setError('All question labels must be filled.');
         return true;
@@ -153,13 +156,13 @@ export default function FormBuilder({
   };
 
   const saveForm = () => {
-    console.log('🚀 ~ saveForm ~ components:', components);
+    formik.handleSubmit();
 
     if (validateForm()) {
       const form = {
-        title,
-        description,
-        questions: components.map((item) =>
+        title: formik.values.title,
+        description: formik.values.description,
+        questions: formik.values.components.map((item) =>
           item.type === 'connect-wallet'
             ? Object({ type: item.type, title: 'Connect Wallet', options: [] })
             : Object({ type: item.type, options: item.options, title: item.label })
@@ -194,43 +197,43 @@ export default function FormBuilder({
     <Stack spacing={2}>
       {/* Title Section */}
       <Stack spacing={1}>
-        {isTitleEditing || title?.length === 0 ? (
+        {isTitleEditing || formik.values.title.length === 0 ? (
           <TextField
-            value={title}
+            value={formik.values.title}
             placeholder="Title"
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => formik.setFieldValue('title', e.target.value)}
             onBlur={() => setIsTitleEditing(false)}
             autoFocus
             fullWidth
           />
         ) : (
           <Typography variant="h4" onClick={() => setIsTitleEditing(true)}>
-            {title}
+            {formik.values.title}
           </Typography>
         )}
       </Stack>
 
       {/* Description Section */}
       <Stack spacing={1}>
-        {isDescriptionEditing || description?.length === 0 ? (
+        {isDescriptionEditing || formik.values.description.length === 0 ? (
           <TextField
-            value={description}
+            value={formik.values.description}
             placeholder="Description"
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => formik.setFieldValue('description', e.target.value)}
             onBlur={() => setIsDescriptionEditing(false)}
             autoFocus
             fullWidth
           />
         ) : (
           <Typography variant="subtitle1" onClick={() => setIsDescriptionEditing(true)}>
-            {description}
+            {formik.values.description}
           </Typography>
         )}
       </Stack>
 
       {/* Form Components Section */}
       <Stack spacing={2} mt={1}>
-        {components.map((component, index) => (
+        {formik.values.components.map((component, index) => (
           <Paper key={index} elevation={4} sx={{ p: 1.5 }}>
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -261,7 +264,7 @@ export default function FormBuilder({
                   <IconButton
                     onClick={() => moveComponent(index, 'down')}
                     size="small"
-                    disabled={index === components.length - 1}
+                    disabled={index === formik.values.components.length - 1}
                   >
                     <Iconify icon="solar:arrow-down-bold" />
                   </IconButton>
@@ -278,9 +281,9 @@ export default function FormBuilder({
                     fullWidth
                     value={component.label}
                     onChange={(e) => {
-                      const newComponents = [...components];
+                      const newComponents = [...formik.values.components];
                       newComponents[index].label = e.target.value;
-                      setComponents(newComponents);
+                      formik.setFieldValue('components', newComponents);
                     }}
                   />
                   {component.type !== 'text' && (
@@ -309,9 +312,9 @@ export default function FormBuilder({
                       <Button
                         variant="outlined"
                         onClick={() => {
-                          const newComponents = [...components];
+                          const newComponents = [...formik.values.components];
                           newComponents[index].options?.push('');
-                          setComponents(newComponents);
+                          formik.setFieldValue('components', newComponents);
                         }}
                       >
                         Add New Option
