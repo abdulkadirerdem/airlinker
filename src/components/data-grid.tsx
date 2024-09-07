@@ -12,14 +12,14 @@ import { deleteAirlink } from 'src/api/airlink/deleteAirlink'; // Adjust the pat
 
 type Props = {
   data:
-    | {
-        _id?: string;
-        type: string;
-        title: string;
-        description: string;
-        createdAt?: string;
-      }[]
-    | undefined;
+  | {
+    _id?: string;
+    type: string;
+    title: string;
+    description: string;
+    createdAt?: string;
+  }[]
+  | undefined;
   error: any;
   selectedWorkspaceId: string | undefined;
 };
@@ -35,8 +35,8 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
       // Invalidate and refetch
       queryClient.invalidateQueries(['airlinks', selectedWorkspaceId]);
     },
-    onError: (error) => {
-      console.error('Error deleting airlink:', error);
+    onError: (deleteError) => {
+      console.error('Error deleting airlink:', deleteError);
     },
   });
   const theme = useTheme();
@@ -128,11 +128,11 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         rows={
           data
             ? data
-                .sort(
-                  (a, b) =>
-                    new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
-                )
-                .map((item) => Object({ ...item, id: item._id }))
+              .sort(
+                (a, b) =>
+                  new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
+              )
+              .map((item) => Object({ ...item, id: item._id }))
             : []
         }
         disableRowSelectionOnClick
