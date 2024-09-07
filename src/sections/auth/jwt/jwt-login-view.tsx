@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useWallet } from '@solana/wallet-adapter-react';
 
 import Link from '@mui/material/Link';
 import { Button } from '@mui/material';
@@ -19,7 +18,6 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useRouter, useSearchParams } from 'src/routes/hooks';
 
-import useTokens from 'src/hooks/use-tokens';
 import { useBoolean } from 'src/hooks/use-boolean';
 
 import { useAuthContext } from 'src/auth/hooks';
@@ -32,13 +30,11 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 
 export default function JwtLoginView() {
   const { login } = useAuthContext();
-  const wallet = useWallet(); // Cüzdan bağlantısı kontrolü
 
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState('');
   // Use the custom useTokens hook to get tokens with metadata
-  const tokens = useTokens(wallet.publicKey);
 
   const searchParams = useSearchParams();
 
@@ -51,18 +47,12 @@ export default function JwtLoginView() {
     password: Yup.string().required('Password is required'),
   });
 
-  const defaultValues = {
-    email: 'test@test.com',
-    password: '123456',
-  };
-
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = `${process.env.NEXT_PUBLIC_HOST_API}/auth/google`;
   };
 
   const methods = useForm({
     resolver: yupResolver(LoginSchema),
-    defaultValues,
   });
 
   const {
@@ -140,7 +130,7 @@ export default function JwtLoginView() {
       {renderHead}
 
       {/* <Alert severity="info" sx={{ mb: 3 }}>
-        Use email : <strong>demo@airlinkers.cc</strong> / password :<strong> demo1234</strong>
+        Use email : <strong>demo@airlinker.cc</strong> / password :<strong> demo1234</strong>
       </Alert> */}
 
       {!!errorMsg && (
