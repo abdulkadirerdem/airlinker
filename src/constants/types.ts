@@ -59,3 +59,17 @@ export interface QuestionType {
   type: string;
   options: Array<string>;
 }
+
+export interface Component {
+  type: string;
+  label: string;
+  options?: string[];
+  correctAnswer?: [string] | [] | any | string;
+}
+
+export interface FormValues {
+  title: string;
+  description: string;
+  components: Component[];
+  correctAnswer?: [string] | [] | any | string;
+}
