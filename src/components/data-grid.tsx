@@ -33,6 +33,7 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
     mutationFn: deleteAirlink,
     onSuccess: () => {
       // Invalidate and refetch
+      // @ts-ignore
       queryClient.invalidateQueries(['airlinks', selectedWorkspaceId]);
     },
     onError: (deleteError) => {
