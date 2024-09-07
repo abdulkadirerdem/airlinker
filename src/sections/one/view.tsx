@@ -111,7 +111,7 @@ export default function OneView() {
             sx={{
               height: 100,
               borderRadius: 0.5,
-              border: '1px solid grey',
+              border: `1px solid ${theme.palette.primary.dark}`,
               p: 2,
               display: 'flex',
               flexDirection: 'column',
@@ -124,8 +124,8 @@ export default function OneView() {
               router.push(`${paths.builder.form}/${selectedWorkspaceId}`);
             }}
           >
-            <Icon icon="mdi:form-outline" fontSize={40} />
-            <Typography fontSize={14} fontWeight="600">
+            <Icon icon="mdi:form-outline" fontSize={40} color={theme.palette.primary.dark} />
+            <Typography fontSize={14} fontWeight="600" color={theme.palette.primary.dark}>
               Form
             </Typography>
           </Paper>
@@ -138,7 +138,7 @@ export default function OneView() {
             sx={{
               height: 100,
               borderRadius: 0.5,
-              border: '1px solid grey',
+              border: `1px solid ${theme.palette.primary.dark}`,
               p: 2,
               display: 'flex',
               flexDirection: 'column',
@@ -151,8 +151,8 @@ export default function OneView() {
               router.push(`${paths.builder.quiz}/${selectedWorkspaceId}`);
             }}
           >
-            <Icon icon="mdi:quiz-outline" fontSize={40} />
-            <Typography fontSize={14} fontWeight="600">
+            <Icon icon="mdi:quiz-outline" fontSize={40} color={theme.palette.primary.dark} />
+            <Typography fontSize={14} fontWeight="600" color={theme.palette.primary.dark}>
               Quiz
             </Typography>
           </Paper>
@@ -165,7 +165,7 @@ export default function OneView() {
             sx={{
               height: 100,
               borderRadius: 0.5,
-              border: '1px solid grey',
+              border: `1px solid ${theme.palette.primary.dark}`,
               p: 2,
               display: 'flex',
               flexDirection: 'column',
@@ -178,8 +178,8 @@ export default function OneView() {
               router.push(`${paths.builder.raffle}/${selectedWorkspaceId}`);
             }}
           >
-            <Icon icon="fad:random-2dice" fontSize={45} />
-            <Typography fontSize={14} fontWeight="600">
+            <Icon icon="fad:random-2dice" fontSize={45} color={theme.palette.primary.dark} />
+            <Typography fontSize={14} fontWeight="600" color={theme.palette.primary.dark}>
               Raffle
             </Typography>
           </Paper>

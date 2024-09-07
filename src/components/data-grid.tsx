@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, useTheme, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 
 import { useRouter } from 'src/routes/hooks';
@@ -11,20 +11,21 @@ import Iconify from 'src/components/iconify';
 
 type Props = {
   data:
-  | {
-    _id?: string;
-    type: string;
-    title: string;
-    description: string;
-    createdAt?: string;
-  }[]
-  | undefined;
+    | {
+        _id?: string;
+        type: string;
+        title: string;
+        description: string;
+        createdAt?: string;
+      }[]
+    | undefined;
   error: any;
   selectedWorkspaceId: string | undefined;
 };
 
 export default function DataGridTable({ data, error, selectedWorkspaceId }: Props) {
   const router = useRouter();
+  const theme = useTheme();
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -60,8 +61,12 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         flex: 3,
         renderCell: (params) => (
           <Button
-            sx={{ alignSelf: 'center' }}
-            variant="contained"
+            sx={{
+              alignSelf: 'center',
+              borderColor: theme.palette.primary.dark,
+              color: theme.palette.primary.dark,
+            }}
+            variant="outlined"
             // sx={{ cursor: 'pointer' }}
             onClick={() => {
               router.push(`/responses/${selectedWorkspaceId}/${params.id}`);
@@ -123,11 +128,11 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         rows={
           data
             ? data
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
-              )
-              .map((item) => Object({ ...item, id: item._id }))
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
+                )
+                .map((item) => Object({ ...item, id: item._id }))
             : []
         }
         disableRowSelectionOnClick
