@@ -64,7 +64,6 @@ export default function ResponseContent() {
   // Check if formData is valid and has a type
   if (!formData || !formData.type) return <p style={{ padding: 5 }}>Invalid data!</p>; // Added check
 
-  console.log('Dataa: ', formData);
 
   if (isLoading) return 'Loading...';
 

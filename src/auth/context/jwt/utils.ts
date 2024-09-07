@@ -59,7 +59,6 @@ export const tokenExpired = (exp: number) => {
 // ----------------------------------------------------------------------
 
 export const setSession = (accessToken: string | null) => {
-  console.log('setSession:::: ', accessToken);
 
   if (accessToken) {
     sessionStorage.setItem('accessToken', accessToken);
