@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, useTheme, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { useRouter } from 'src/routes/hooks';
 import Iconify from 'src/components/iconify';
@@ -12,14 +12,14 @@ import { deleteAirlink } from 'src/api/airlink/deleteAirlink'; // Adjust the pat
 
 type Props = {
   data:
-  | {
-    _id?: string;
-    type: string;
-    title: string;
-    description: string;
-    createdAt?: string;
-  }[]
-  | undefined;
+    | {
+        _id?: string;
+        type: string;
+        title: string;
+        description: string;
+        createdAt?: string;
+      }[]
+    | undefined;
   error: any;
   selectedWorkspaceId: string | undefined;
 };
@@ -39,6 +39,7 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
       console.error('Error deleting airlink:', error);
     },
   });
+  const theme = useTheme();
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -73,8 +74,12 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         flex: 3,
         renderCell: (params) => (
           <Button
-            sx={{ alignSelf: 'center' }}
-            variant="contained"
+            sx={{
+              alignSelf: 'center',
+              borderColor: theme.palette.primary.dark,
+              color: theme.palette.primary.dark,
+            }}
+            variant="outlined"
             onClick={() => {
               router.push(`/responses/${selectedWorkspaceId}/${params.id}`);
             }}
@@ -109,7 +114,7 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         ],
       },
     ],
-    [router, selectedWorkspaceId, deleteAirlinkMutation] // Add deleteAirlinkMutation to dependencies
+    [router, selectedWorkspaceId, theme.palette.primary.dark, deleteAirlinkMutation]
   );
 
   if (error) {
@@ -123,11 +128,11 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         rows={
           data
             ? data
-              .sort(
-                (a, b) =>
-                  new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
-              )
-              .map((item) => Object({ ...item, id: item._id }))
+                .sort(
+                  (a, b) =>
+                    new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
+                )
+                .map((item) => Object({ ...item, id: item._id }))
             : []
         }
         disableRowSelectionOnClick
