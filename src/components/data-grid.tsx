@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-
 import { Box, Button, Typography } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
-
 import { useRouter } from 'src/routes/hooks';
-
 import Iconify from 'src/components/iconify';
+import { useMutation, useQueryClient } from '@tanstack/react-query'; // Import useMutation and useQueryClient
+
+// Delete function import
+import { deleteAirlink } from 'src/api/airlink/deleteAirlink'; // Adjust the path if needed
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +26,19 @@ type Props = {
 
 export default function DataGridTable({ data, error, selectedWorkspaceId }: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient(); // Initialize Query Client
+
+  // Delete Mutation
+  const deleteAirlinkMutation = useMutation({
+    mutationFn: deleteAirlink,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(['airlinks', selectedWorkspaceId]);
+    },
+    onError: (error) => {
+      console.error('Error deleting airlink:', error);
+    },
+  });
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -45,7 +59,6 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         renderCell: (params) => (
           <Button
             variant="text"
-            // sx={{ cursor: 'pointer' }}
             onClick={() => {
               router.push(`/form/${selectedWorkspaceId}/${params.id}`);
             }}
@@ -62,7 +75,6 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
           <Button
             sx={{ alignSelf: 'center' }}
             variant="contained"
-            // sx={{ cursor: 'pointer' }}
             onClick={() => {
               router.push(`/responses/${selectedWorkspaceId}/${params.id}`);
             }}
@@ -89,27 +101,15 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         getActions: (params) => [
           <GridActionsCellItem
             showInMenu
-            icon={<Iconify icon="solar:eye-bold" />}
-            label="View"
-            onClick={() => console.info('VIEW', params.row.id)}
-          />,
-          <GridActionsCellItem
-            showInMenu
-            icon={<Iconify icon="solar:pen-bold" />}
-            label="Edit"
-            onClick={() => console.info('EDIT', params.row.id)}
-          />,
-          <GridActionsCellItem
-            showInMenu
             icon={<Iconify icon="solar:trash-bin-trash-bold" />}
             label="Delete"
-            onClick={() => console.info('DELETE', params.row.id)}
+            onClick={() => deleteAirlinkMutation.mutate(params.row._id)} // Use mutation on click
             sx={{ color: 'error.main' }}
           />,
         ],
       },
     ],
-    [router, selectedWorkspaceId]
+    [router, selectedWorkspaceId, deleteAirlinkMutation] // Add deleteAirlinkMutation to dependencies
   );
 
   if (error) {
