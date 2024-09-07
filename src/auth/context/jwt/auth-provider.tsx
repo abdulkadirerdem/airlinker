@@ -1,13 +1,19 @@
 'use client';
-import { useMemo, useEffect, useReducer, useCallback } from 'react';
 
+import { useMemo, useEffect, useReducer, useCallback } from 'react';
 
 import axios, { endpoints } from 'src/utils/axios';
 
 import { AuthContext } from './auth-context';
-import { setSession, isValidToken } from './utils';
+import { jwtDecode, setSession } from './utils';
 import { AuthUserType, ActionMapType, AuthStateType } from '../../types';
 
+// ----------------------------------------------------------------------
+/**
+ * NOTE:
+ * We only build demo at basic level.
+ * Customer will need to do some extra handling yourself if you want to extend the logic and other features...
+ */
 // ----------------------------------------------------------------------
 
 enum Types {
@@ -69,6 +75,8 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
 
 // ----------------------------------------------------------------------
 
+const STORAGE_KEY = 'accessToken';
+
 type Props = {
   children: React.ReactNode;
 };
@@ -78,8 +86,11 @@ export function AuthProvider({ children }: Props) {
 
   const initialize = useCallback(async () => {
     try {
-      if (isValidToken()) {
-        setSession();
+      const accessToken = sessionStorage.getItem(STORAGE_KEY);
+
+      //! isValidToken(accessToken) buradan kaldırıldı. Daha sonra tekrar ekle.
+      if (accessToken) {
+        setSession(accessToken);
 
         const res = await axios.get(endpoints.auth.me);
 
@@ -90,6 +101,7 @@ export function AuthProvider({ children }: Props) {
           payload: {
             user: {
               ...user,
+              accessToken,
             },
           },
         });
@@ -118,20 +130,25 @@ export function AuthProvider({ children }: Props) {
 
   // LOGIN
   const login = useCallback(async (email: string, password: string) => {
-    const data = { email, password };
-    await axios.post(endpoints.auth.login, data, { withCredentials: true });
+    const data = {
+      email,
+      password,
+    };
 
-    setSession();
+    const res = await axios.post(endpoints.auth.login, data);
 
-    const res = await axios.get(endpoints.auth.me);
-    const { email: resEmail, username } = res.data.user;
+    const { accessToken } = res.data;
+
+    const user = jwtDecode(accessToken);
+
+    setSession(accessToken);
 
     dispatch({
       type: Types.LOGIN,
       payload: {
         user: {
-          email: resEmail,
-          username,
+          ...user,
+          accessToken,
         },
       },
     });
@@ -140,26 +157,44 @@ export function AuthProvider({ children }: Props) {
   // REGISTER
   const register = useCallback(
     async (email: string, password: string, firstName: string, lastName: string) => {
-      const data = { email, password, firstName, lastName };
-      await axios.post(endpoints.auth.register, data);
+      const data = {
+        email,
+        password,
+        firstName,
+        lastName,
+      };
+
+      const res = await axios.post(endpoints.auth.register, data);
+
+      const { accessToken, user } = res.data;
+
+      sessionStorage.setItem(STORAGE_KEY, accessToken);
+
+      dispatch({
+        type: Types.REGISTER,
+        payload: {
+          user: {
+            ...user,
+            accessToken,
+          },
+        },
+      });
     },
     []
   );
 
-  const deleteCookie = (name: string) => {
-    document.cookie = `${name}=; Max-Age=0; path=/;`;
-  };
-
   // LOGOUT
   const logout = useCallback(async () => {
-    deleteCookie('COOKIE-KEY');
-    setSession();
-    dispatch({ type: Types.LOGOUT });
+    setSession(null);
+    dispatch({
+      type: Types.LOGOUT,
+    });
   }, []);
 
   // ----------------------------------------------------------------------
 
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
+
   const status = state.loading ? 'loading' : checkAuthenticated;
 
   const memoizedValue = useMemo(
@@ -169,6 +204,7 @@ export function AuthProvider({ children }: Props) {
       loading: status === 'loading',
       authenticated: status === 'authenticated',
       unauthenticated: status === 'unauthenticated',
+      //
       login,
       register,
       logout,

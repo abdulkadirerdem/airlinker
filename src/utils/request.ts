@@ -3,7 +3,7 @@ import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import { HOST_API } from 'src/config-global';
 
 // Create an axios instance
-const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true });
+export const axiosInstance = axios.create({ baseURL: HOST_API, withCredentials: true });
 
 axiosInstance.interceptors.response.use(
   (res) => res,
@@ -23,11 +23,6 @@ const request = async <T>(
   queryParams: Record<string, any> = {}
 ): Promise<T> => {
   try {
-    const sessionToken = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('COOKIE-KEY='))
-      ?.split('=')[1];
-
     const config: RequestConfig = {
       method,
       url: endpoint,
@@ -36,7 +31,6 @@ const request = async <T>(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        Authorization: `Bearer ${sessionToken}`,
       },
     };
 
