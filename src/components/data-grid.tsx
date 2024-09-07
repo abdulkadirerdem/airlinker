@@ -114,7 +114,7 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         ],
       },
     ],
-    [router, selectedWorkspaceId]
+    [router, selectedWorkspaceId, theme.palette.primary.dark]
   );
 
   if (error) {
