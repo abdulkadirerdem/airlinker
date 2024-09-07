@@ -79,10 +79,75 @@ export default function FormBuilder({
     formik.setFieldValue('components', newComponents);
   };
 
+  const validateForm = (): boolean => {
+    if (formik.values.components?.length === 0) {
+      setError('Add some questions.');
+      return false;
+    }
+
+    // Check if title and description are not empty
+    if (!formik.values.title.trim() || !formik.values.description.trim()) {
+      setError('Title and Description cannot be empty.');
+      return false;
+    }
+
+    // Check each component for validity
+    const invalidComponent = formik.values.components.find((component) => {
+      if (component.type !== 'connect-wallet' && !component.label.trim()) {
+        setError('All question labels must be filled.');
+        return true;
+      }
+
+      if (
+        (component.type === 'radio' || component.type === 'multiple-choice') &&
+        (!component.options || component.options.some((option) => !option.trim()))
+      ) {
+        setError('All options must be filled.');
+        return true;
+      }
+
+      if (
+        (component.type === 'radio' || component.type === 'multiple-choice') &&
+        (component.options === undefined ||
+          component.options?.length < 2 ||
+          component.options?.length > 5)
+      ) {
+        setError('Options must be between 2 and 5.');
+        return true;
+      }
+
+      if (formType === 'quiz') {
+        if (component.type === 'radio' || component.type === 'multiple-choice') {
+          if (!component.correctAnswer || component.correctAnswer.length === 0) {
+            setError('At least one correct answer must be provided.');
+            return true;
+          }
+        }
+
+        if (component.type === 'text') {
+          if (!component.correctAnswer || component.correctAnswer.length === 0) {
+            setError('A correct answer must be provided for text type.');
+            return true;
+          }
+        }
+      }
+
+      return false;
+    });
+
+    if (invalidComponent) {
+      return false;
+    }
+
+    // No errors
+    setError(null);
+    return true;
+  };
 
 
   const saveForm = () => {
-    formik.handleSubmit();
+    if (validateForm())
+      formik.handleSubmit();
   };
 
   return (
