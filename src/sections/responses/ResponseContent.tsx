@@ -40,7 +40,6 @@ export default function ResponseContent() {
   const formData: any =
     !isLoading && data !== undefined ? data.filter((item) => item?._id === airlinkId)[0] : [];
 
-  console.log('Dataa: ', formData);
 
   if (isLoading) return 'Loading...';
 
