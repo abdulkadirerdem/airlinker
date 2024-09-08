@@ -18,8 +18,9 @@ import { createAirlink } from 'src/api/airlink/createAirlink';
 import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
 import { FormValues } from 'src/constants/types';
-import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
 import Image from 'next/image';
+
+import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
 
 
 export default function Page() {

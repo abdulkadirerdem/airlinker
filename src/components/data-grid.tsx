@@ -43,6 +43,17 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
   });
   const theme = useTheme();
 
+  const iconSwitch = (key: string) => {
+    switch (key) {
+      case "raffle":
+        return "fad:random-2dice"
+      case "quiz":
+        return "mdi:quiz-outline"
+      default:
+        return "mdi:form-outline"
+    }
+  }
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -120,7 +131,8 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
         flex: 1.25,
         renderCell: (params) => (
           <Chip
-            avatar={<Iconify icon={params.row.type === "raffle" ? "fad:random-2dice" : params.row.type === "quiz" ? "mdi:quiz-outline" : "mdi:form-outline"} />}
+            // @ts-ignore
+            avatar={<Iconify icon={iconSwitch(params.row.type)} />}
             label={<p style={{ textTransform: "capitalize" }}> {params.row.type}</p>}
             variant="outlined"
             sx={{ borderRadius: 0.5 }}
