@@ -5,11 +5,17 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import { Button } from '@mui/material';
 
+import { useRouter } from 'src/routes/hooks';
+
+import { useAuthContext } from 'src/auth/hooks';
+import { PATH_AFTER_LOGIN } from 'src/config-global';
 import { createNonce } from 'src/api/wallet/createNonce';
 import { verifyWallet } from 'src/api/wallet/verifiyWallet';
 
 const LoginWithWallet: FC = () => {
     const { publicKey, signMessage } = useWallet();
+    const { login } = useAuthContext();
+    const router = useRouter();
 
     const { data, isLoading } = useQuery({
         queryKey: ["nonce"],
@@ -39,13 +45,15 @@ const LoginWithWallet: FC = () => {
         });
 
         if (verifyResponse) {
-            const { token } = verifyResponse;
-            alert(`Başarılı giriş! JWT Token: ${token}`);
-            // Token'ı sakla ve kullan
+            const { token: accessToken } = verifyResponse;
+
+            // @ts-ignore
+            login(null, null, publicKey, accessToken);
+            router.push(PATH_AFTER_LOGIN);
         } else {
             alert('Kimlik doğrulama başarısız.');
         }
-    }, [data, mutateAsync, publicKey, signMessage]);
+    }, [data?.message, login, mutateAsync, publicKey, router, signMessage]);
 
     return (
         <div>

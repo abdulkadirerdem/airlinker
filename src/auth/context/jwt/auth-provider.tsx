@@ -16,7 +16,7 @@ import { AuthUserType, ActionMapType, AuthStateType } from '../../types';
  */
 // ----------------------------------------------------------------------
 
-enum Types {
+export enum Types {
   INITIAL = 'INITIAL',
   LOGIN = 'LOGIN',
   REGISTER = 'REGISTER',
@@ -40,12 +40,12 @@ type ActionsType = ActionMapType<Payload>[keyof ActionMapType<Payload>];
 
 // ----------------------------------------------------------------------
 
-const initialState: AuthStateType = {
+export const initialState: AuthStateType = {
   user: null,
   loading: true,
 };
 
-const reducer = (state: AuthStateType, action: ActionsType) => {
+export const reducer = (state: AuthStateType, action: ActionsType) => {
   if (action.type === Types.INITIAL) {
     return {
       loading: false,
@@ -129,39 +129,67 @@ export function AuthProvider({ children }: Props) {
   }, [initialize]);
 
   // LOGIN
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email?: string, password?: string, walletAddress?: string, accessToken?: string) => {
     const data = {
       email,
       password,
+      walletAddress,
+      accessToken
     };
+
+    if (walletAddress) {
+      if (!accessToken) {
+        throw new Error('Access token is required for wallet login');
+      }
+      const user = jwtDecode(accessToken);
+      setSession(accessToken);
+
+
+      return dispatch({
+        type: Types.LOGIN,
+        payload: {
+          user: {
+            ...user,
+            accessToken,
+          },
+        },
+      });
+
+      // eslint-disable-next-line no-else-return
+    }
 
     const res = await axios.post(endpoints.auth.login, data);
 
-    const { accessToken } = res.data;
+    const { accessToken: newAccessToken } = res.data;
 
-    const user = jwtDecode(accessToken);
+    const user = jwtDecode(newAccessToken);
 
-    setSession(accessToken);
+    setSession(newAccessToken);
 
-    dispatch({
+    return dispatch({
       type: Types.LOGIN,
       payload: {
         user: {
           ...user,
-          accessToken,
+          accessToken: newAccessToken,
         },
       },
     });
+
+
+
+
   }, []);
 
   // REGISTER
   const register = useCallback(
-    async (email: string, password: string, firstName: string, lastName: string) => {
+    async (email: string, password: string, firstName: string, lastName: string, walletAddress?: string) => {
       const data = {
         email,
         password,
         firstName,
         lastName,
+        walletAddress,
       };
 
       const res = await axios.post(endpoints.auth.register, data);
@@ -193,6 +221,7 @@ export function AuthProvider({ children }: Props) {
 
   // ----------------------------------------------------------------------
 
+  console.info("Statee:", state)
   const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
 
   const status = state.loading ? 'loading' : checkAuthenticated;
