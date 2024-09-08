@@ -124,7 +124,8 @@ export default function Header({ onOpenNav }: Props) {
             onClick={onClick}
           >
             SEND SOL
-          </Button>*/}
+          </Button>
+          */}
         <WalletMultiButton />
         <AccountPopover />
       </Stack>
