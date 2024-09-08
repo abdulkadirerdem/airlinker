@@ -72,12 +72,12 @@ export default function RootLayout({ children }: Props) {
                 <AuthProvider>
                   <SettingsProvider
                     defaultSettings={{
-                      themeMode: 'light', // 'light' | 'dark'
-                      themeDirection: 'ltr', //  'rtl' | 'ltr'
-                      themeContrast: 'default', // 'default' | 'bold'
-                      themeLayout: 'vertical', // 'vertical' | 'horizontal' | 'mini'
-                      themeColorPresets: 'red', // 'default' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
-                      themeStretch: false,
+                      themeMode: "light",
+                      themeDirection: "ltr",
+                      themeContrast: "default",
+                      themeLayout: "mini",
+                      themeColorPresets: "default",
+                      themeStretch: false
                     }}
                   >
                     <ThemeProvider>
