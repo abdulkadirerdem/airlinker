@@ -109,7 +109,7 @@ export default function Page() {
 
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
-          <Paper elevation={2} sx={{ height: 300 }}>
+          <Paper elevation={2} sx={{ maxHeight: "100%", width: 320 }}>
             <WidgetPanel onSelect={(type, options) => handleWidgetAdded(type, options)} />
           </Paper>
         </Stack>
