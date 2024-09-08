@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Box, Select, MenuItem, Typography, InputLabel, FormControl } from '@mui/material';
+import { Box, Select, MenuItem, Typography, InputLabel, FormControl, useTheme } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -17,6 +17,7 @@ export default function MenuView({
   selectedIndex: number;
   setSelectedIndex: Dispatch<SetStateAction<number>>;
 }) {
+  const theme = useTheme()
   const handleChange = (event: any) => {
     setSelectedIndex(event.target.value);
   };
@@ -28,10 +29,15 @@ export default function MenuView({
   return (
     <Box width="fit-content" mb={2} mt={2} minWidth={250}>
       <FormControl fullWidth>
-        <InputLabel id="select-label">Workspaces</InputLabel>
+        <InputLabel id="select-label" sx={{ background: "white", px: 1 }}>Workspaces</InputLabel>
         <Select
           sx={{
             backgroundColor: 'white',
+            borderColor: theme.palette.primary.darker,
+            borderStyle: "solid",
+            borderWidth: 0.3,
+            color: "black",
+            borderRadius: 0.5
           }}
           labelId="select-label"
           id="select"
@@ -41,7 +47,7 @@ export default function MenuView({
           label="Workspaces"
         >
           {data.map((option: any, index: number) => (
-            <MenuItem key={option?._id} value={index}>
+            <MenuItem key={option?._id} value={index} sx={{ borderRadius: 0.5, borderColor: "black", }}>
               {option?.title}
             </MenuItem>
           ))}

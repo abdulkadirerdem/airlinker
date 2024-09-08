@@ -107,7 +107,8 @@ export default function OneView() {
           <Paper
             component={Button}
             fullWidth
-            elevation={2}
+            variant='elevation'
+            elevation={4}
             sx={{
               height: 100,
               borderRadius: 0.5,
@@ -134,7 +135,8 @@ export default function OneView() {
           <Paper
             component={Button}
             fullWidth
-            elevation={2}
+            variant='elevation'
+            elevation={4}
             sx={{
               height: 100,
               borderRadius: 0.5,
@@ -161,7 +163,8 @@ export default function OneView() {
           <Paper
             component={Button}
             fullWidth
-            elevation={2}
+            variant='elevation'
+            elevation={4}
             sx={{
               height: 100,
               borderRadius: 0.5,
