@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Box, Button, useTheme, Typography } from '@mui/material';
+import { Box, Button, useTheme, Typography, Chip, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { useRouter } from 'src/routes/hooks';
 import Iconify from 'src/components/iconify';
@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'; // Import u
 
 // Delete function import
 import { deleteAirlink } from 'src/api/airlink/deleteAirlink'; // Adjust the path if needed
+import toast from 'react-hot-toast';
 
 // ----------------------------------------------------------------------
 
@@ -57,28 +58,50 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
       {
         field: 'id',
         headerName: 'AirLink',
-        flex: 5,
-        renderCell: (params) => (
-          <Button
-            variant="text"
-            onClick={() => {
-              router.push(`/${params.row.type}/${selectedWorkspaceId}/${params.id}`);
-            }}
-          >{`localhost:8083/${params.row.type}/${selectedWorkspaceId}/${params.id}`}</Button>
-        ),
+        flex: 2,
+        renderCell: (params) => {
+          const link = `https://airlinker.vercel.app/${params.row.type}/${selectedWorkspaceId}/${params.id}`;
+          return (
+            <Box display="flex" alignItems="center" justifyContent="center" height="100%" gap={1}>
+              <Button
+                variant="text"
+                onClick={() => {
+                  router.push(`/${params.row.type}/${selectedWorkspaceId}/${params.id}`);
+                }}
+              >
+                Go to Link
+              </Button>
+              <Button
+                variant="text"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  navigator.clipboard.writeText(link);
+                  toast.success("Copied!", {
+                    position: "bottom-right"
+                  });
+                }}
+              >
+                <Iconify icon="material-symbols:content-copy" />
+              </Button>
+            </Box>
+          );
+        },
       },
+
+
       {
         field: 'responses-field',
         headerName: 'Responses',
         align: 'center',
         headerAlign: 'center',
-        flex: 3,
+        flex: 2,
         renderCell: (params) => (
           <Button
             sx={{
               alignSelf: 'center',
               borderColor: theme.palette.primary.dark,
               color: theme.palette.primary.dark,
+              borderRadius: 0.5
             }}
             variant="outlined"
             onClick={() => {
@@ -92,14 +115,24 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
       {
         field: 'type',
         headerName: 'Type',
-        flex: 1,
+        align: 'center',
+        headerAlign: 'center',
+        flex: 1.25,
+        renderCell: (params) => (
+          <Chip
+            avatar={<Iconify icon={params.row.type === "raffle" ? "fad:random-2dice" : params.row.type === "quiz" ? "mdi:quiz-outline" : "mdi:form-outline"} />}
+            label={<p style={{ textTransform: "capitalize" }}> {params.row.type}</p>}
+            variant="outlined"
+            sx={{ borderRadius: 0.5 }}
+          />
+        ),
       },
       {
         type: 'actions',
         field: 'actions',
         headerName: 'Actions',
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         flex: 1,
         sortable: false,
         filterable: false,
@@ -141,3 +174,4 @@ export default function DataGridTable({ data, error, selectedWorkspaceId }: Prop
     </Box>
   );
 }
+
