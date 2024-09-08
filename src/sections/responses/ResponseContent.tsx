@@ -3,9 +3,40 @@
 import Confetti from 'react-confetti';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import {
+  Bar,
+  XAxis,
+  YAxis,
+  Legend,
+  Tooltip,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 
-import { Container } from '@mui/system';
-import { Box, Paper, Button, Divider, TextField, Typography, InputAdornment } from '@mui/material';
+
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+        import { Container } from '@mui/system';
+import {
+  Box,
+  Tab,
+  Grid,
+  Card,
+  Tabs,
+  Paper,
+  Button,
+  Typography,
+  IconButton,
+  CardContent,
+  Container,
+     Divider,
+     TextField,
+    InputAdornment
+} from '@mui/material';
+
 
 import { usePathname } from 'src/routes/hooks';
 
@@ -13,7 +44,11 @@ import { drawWinner } from 'src/api/raffle/drawWinner';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
 
 import QuestionWithAnswer from 'src/components/questions-with-answers';
+
 import { useSolanaTransfer } from 'src/components/web-3/useSolanaTransfer';
+
+import { Icon } from '@iconify/react';
+
 
 // ----------------------------------------------------------------------
 
@@ -30,6 +65,8 @@ export default function ResponseContent() {
   const [isRaffling, setIsRaffling] = useState(false);
   const [currentParticipant, setCurrentParticipant] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
+  const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
+  const [tabValue, setTabValue] = useState(0);
 
   const { transfer, isLoading: isTransferLoading } = useSolanaTransfer();
 
@@ -68,6 +105,7 @@ export default function ResponseContent() {
   // Check if formData is valid and has a type
   if (!formData || !formData.type) return <p style={{ padding: 5 }}>Invalid data!</p>; // Added check
 
+
   if (isLoading || isTransferLoading) return 'Loading...';
 
   const handleTransfer = async (recieveAddress: string, prizeAmount: number) => {
@@ -78,6 +116,7 @@ export default function ResponseContent() {
       console.error('Transfer failed:', error);
     }
   };
+
 
   // Updated function to draw a winner
   const drawServerSideWinner = async () => {
@@ -117,10 +156,70 @@ export default function ResponseContent() {
     }
   };
 
+  const handleViewModeChange = () => {
+    setViewMode(viewMode === 'card' ? 'grid' : 'card');
+  };
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const responses =
+    formData[formData.type]?.[formData.type === 'raffle' ? 'participants' : 'responses'] || [];
+  const questions =
+    formData[formData.type]?.[
+      formData.type === 'raffle' ? 'participationInformation' : 'questions'
+    ] || [];
+
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    ...questions.map((question: any, index: number) => ({
+      field: `question${index}`,
+      headerName: question.title,
+      width: 200,
+    })),
+  ];
+
+  const rows = responses.map((response: any, index: number) => ({
+    id: index + 1,
+    ...response.answers.reduce((acc: any, answer: any, idx: number) => {
+      acc[`question${idx}`] = answer.answer;
+      return acc;
+    }, {}),
+  }));
+
+  const chartData = questions.map((question: any) => ({
+    question: question.title,
+    count: responses.filter((response: any) =>
+      response.answers.some((answer: any) => answer.questionId === question._id)
+    ).length,
+  }));
+
+  // Add this new function to prepare data for pie charts
+  const preparePieChartData = () =>
+    questions.map((question: any) => {
+      const answerCounts: { [key: string]: number } = {};
+      responses.forEach((response: any) => {
+        const answer = response.answers.find((a: any) => a.questionId === question._id)?.answer;
+        if (answer) {
+          answerCounts[answer] = (answerCounts[answer] || 0) + 1;
+        }
+      });
+      return {
+        question: question.title,
+        data: Object.entries(answerCounts).map(([name, value]) => ({ name, value })),
+      };
+    });
+
+  const pieChartData = preparePieChartData();
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
   return (
+
     <Container maxWidth="md">
       <Paper elevation={12} sx={{ p: 2, px: 4, mt: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+
           <Box>
             <Typography variant="h4" gutterBottom>
               {formData.title || 'No Title'}
@@ -130,6 +229,7 @@ export default function ResponseContent() {
             </Typography>
           </Box>
           {formData.type === 'raffle' && (
+
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
               <TextField
                 label="Solana Prize"
@@ -181,7 +281,6 @@ export default function ResponseContent() {
             {showConfetti && <Confetti />}
           </Box>
         )}
-
         {formData[formData.type]?.[formData.type === 'raffle' ? 'participants' : 'responses']?.map(
           (response: any, index: number) => (
             <Paper elevation={6} sx={{ p: 2, mt: 3 }} key={response._id}>
