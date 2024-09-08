@@ -1,32 +1,49 @@
-import bs58 from 'bs58';
 import { NextResponse } from 'next/server';
 import * as solanaWeb3 from '@solana/web3.js';
 
 export async function POST(request: any) {
-  const body = await request.json();
-  const { fromAddress, toAddress, prizeAmount } = body;
-  const devnetRPC = 'https://api.devnet.solana.com';
+  try {
+    const body = await request.json();
+    const { fromAddress, toAddress } = body;
+    const devnetRPC = 'https://api.devnet.solana.com';
 
-  const connection = new solanaWeb3.Connection(devnetRPC);
+    const connection = new solanaWeb3.Connection(devnetRPC);
 
-  const fromWallet = solanaWeb3.Keypair.fromSecretKey(bs58.decode(fromAddress));
+    // Create PublicKey objects from the addresses
+    const fromPubKey = new solanaWeb3.PublicKey(fromAddress);
+    const toPubKey = new solanaWeb3.PublicKey(toAddress);
 
-  const sendToPubKey = new solanaWeb3.PublicKey(toAddress);
+    const prizeAmountLamports = solanaWeb3.LAMPORTS_PER_SOL * 0.5;
 
-  const prizeAmountLamports = solanaWeb3.LAMPORTS_PER_SOL * prizeAmount;
+    const transaction = new solanaWeb3.Transaction().add(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: fromPubKey,
+        toPubkey: toPubKey,
+        lamports: prizeAmountLamports,
+      })
+    );
 
-  const transaction = new solanaWeb3.Transaction().add(
-    solanaWeb3.SystemProgram.transfer({
-      fromPubkey: fromWallet.publicKey,
-      toPubkey: sendToPubKey,
-      lamports: prizeAmountLamports,
-    })
-  );
-  transaction.feePayer = fromWallet.publicKey;
+    // Set the fee payer to the fromAddress
+    transaction.feePayer = fromPubKey;
 
-  const signature = await solanaWeb3.sendAndConfirmTransaction(connection, transaction, [
-    fromWallet,
-  ]);
+    // Get the latest blockhash
+    const latestBlockhash = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = latestBlockhash.blockhash;
 
-  return NextResponse.json({ message: 'Congrats!', signature });
+    // Serialize the transaction
+    const serializedTransaction = transaction.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false,
+    });
+
+    const transactionBase64 = serializedTransaction.toString('base64');
+
+    return NextResponse.json({
+      message: 'Transaction created',
+      transaction: transactionBase64,
+    });
+  } catch (error) {
+    console.error('Transaction creation error:', error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }
