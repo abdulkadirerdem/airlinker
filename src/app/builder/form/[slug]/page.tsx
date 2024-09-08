@@ -19,7 +19,7 @@ import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
 import { FormValues } from 'src/constants/types';
 import Image from 'next/image';
-import BuilderBadge from "../../../../assets/illustrations/builder-forms.png"
+import BuilderBadge from '../../../../assets/illustrations/builder-forms.png';
 
 export default function Page() {
   const pathname = usePathname();
@@ -39,6 +39,8 @@ export default function Page() {
 
   const formik = useFormik<FormValues>({
     initialValues: {
+      type: 'form',
+      prize: '0',
       title: 'Form Title',
       description: 'Form Description',
       components: [],
@@ -107,7 +109,7 @@ export default function Page() {
             mr: 2.5,
             position: 'absolute',
             top: 62,
-            left: 220,
+            left: 300,
             zIndex: 9,
           }}
         />
@@ -129,6 +131,7 @@ export default function Page() {
               formik={formik}
               selectedType={selectedType}
               onWidgetAdded={handleWidgetAdded}
+              formType="form"
             />
           </Paper>
         </Stack>

@@ -14,13 +14,13 @@ import {
   TextField,
   Typography,
   IconButton,
+  InputAdornment,
+  Box,
 } from '@mui/material';
 
 import { FormValues } from 'src/constants/types';
 
 import Iconify from 'src/components/iconify';
-
-
 
 interface FormBuilderProps {
   formik: ReturnType<typeof useFormik<FormValues>>;
@@ -39,8 +39,7 @@ export default function FormBuilder({
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [isDescriptionEditing, setIsDescriptionEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null); // Error state for validation messages
-
-
+  const [prize, setPrize] = useState<string>('');
 
   useEffect(() => {
     if (selectedType) {
@@ -144,49 +143,68 @@ export default function FormBuilder({
     return true;
   };
 
-
   const saveForm = () => {
-    if (validateForm())
-      formik.handleSubmit();
+    if (validateForm()) formik.handleSubmit();
   };
 
   return (
     <Stack spacing={2}>
-      {/* Title Section */}
-      <Stack spacing={1}>
-        {isTitleEditing || formik.values.title.length === 0 ? (
-          <TextField
-            value={formik.values.title}
-            placeholder="Title"
-            onChange={(e) => formik.setFieldValue('title', e.target.value)}
-            onBlur={() => setIsTitleEditing(false)}
-            autoFocus
-            fullWidth
-          />
-        ) : (
-          <Typography variant="h4" onClick={() => setIsTitleEditing(true)}>
-            {formik.values.title}
-          </Typography>
-        )}
-      </Stack>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Stack spacing={2} sx={{ flex: 1 }}>
+          {/* Title Section */}
+          <Stack spacing={1}>
+            {isTitleEditing || formik.values.title.length === 0 ? (
+              <TextField
+                value={formik.values.title}
+                placeholder="Title"
+                onChange={(e) => formik.setFieldValue('title', e.target.value)}
+                onBlur={() => setIsTitleEditing(false)}
+                autoFocus
+                fullWidth
+              />
+            ) : (
+              <Typography variant="h4" onClick={() => setIsTitleEditing(true)}>
+                {formik.values.title}
+              </Typography>
+            )}
+          </Stack>
 
-      {/* Description Section */}
-      <Stack spacing={1}>
-        {isDescriptionEditing || formik.values.description.length === 0 ? (
-          <TextField
-            value={formik.values.description}
-            placeholder="Description"
-            onChange={(e) => formik.setFieldValue('description', e.target.value)}
-            onBlur={() => setIsDescriptionEditing(false)}
-            autoFocus
-            fullWidth
-          />
-        ) : (
-          <Typography variant="subtitle1" onClick={() => setIsDescriptionEditing(true)}>
-            {formik.values.description}
-          </Typography>
-        )}
-      </Stack>
+          {/* Description Section */}
+          <Stack spacing={1}>
+            {isDescriptionEditing || formik.values.description.length === 0 ? (
+              <TextField
+                value={formik.values.description}
+                placeholder="Description"
+                onChange={(e) => formik.setFieldValue('description', e.target.value)}
+                onBlur={() => setIsDescriptionEditing(false)}
+                autoFocus
+                fullWidth
+              />
+            ) : (
+              <Typography variant="subtitle1" onClick={() => setIsDescriptionEditing(true)}>
+                {formik.values.description}
+              </Typography>
+            )}
+          </Stack>
+        </Stack>
+
+        {/* Solana Prize Input */}
+
+        <TextField
+          label="Solana Prize"
+          variant="outlined"
+          size="small"
+          value={prize}
+          onChange={(e) => {
+            setPrize(e.target.value);
+            formik.setFieldValue('prize', e.target.value);
+          }}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">SOL</InputAdornment>,
+          }}
+          sx={{ width: '150px', ml: 2 }}
+        />
+      </Box>
 
       {/* Form Components Section */}
       <Stack spacing={2} mt={1}>
@@ -285,9 +303,9 @@ export default function FormBuilder({
                                 newComponents[index].correctAnswer!.push(option);
                               } else {
                                 // Remove the unselected answer
-                                newComponents[index].correctAnswer = newComponents[index].correctAnswer!.filter(
-                                  (answer: string) => answer !== option
-                                );
+                                newComponents[index].correctAnswer = newComponents[
+                                  index
+                                ].correctAnswer!.filter((answer: string) => answer !== option);
                               }
                               formik.setFieldValue('components', newComponents);
                             }}
@@ -299,7 +317,6 @@ export default function FormBuilder({
                         </IconButton>
                       </Stack>
                     ))}
-
 
                   {(component.type === 'radio' || component.type === 'multiple-choice') &&
                     component.options &&
@@ -315,7 +332,7 @@ export default function FormBuilder({
                         Add New Option
                       </Button>
                     )}
-                  {formType === 'quiz' && component.type === "text" && (
+                  {formType === 'quiz' && component.type === 'text' && (
                     <TextField
                       label="Correct Answer"
                       variant="outlined"
@@ -329,8 +346,6 @@ export default function FormBuilder({
                       sx={{ mt: 1 }}
                     />
                   )}
-
-
                 </>
               ) : (
                 <WalletMultiButton />
