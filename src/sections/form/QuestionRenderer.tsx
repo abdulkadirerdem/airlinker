@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 import {
@@ -26,6 +27,13 @@ export default function QuestionRenderer({
   answers,
   handleInputChange,
 }: QuestionRendererProps) {
+  const { connected, publicKey } = useWallet();
+
+  useEffect(() => {
+    if (question.type === 'connect-wallet' && connected && publicKey) {
+      handleInputChange(question._id, publicKey.toBase58());
+    }
+  }, [connected, publicKey, question._id, handleInputChange, question.type]);
   return (
     <FormControl key={question._id} component="fieldset" margin="normal" fullWidth>
       <Typography variant="h6" fontWeight={500} mb={0.5}>

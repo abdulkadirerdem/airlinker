@@ -44,6 +44,7 @@ export default function Page() {
       title: 'Raffle Title',
       description: 'Raffle Description',
       components: [],
+      whiteList: [],
     },
     onSubmit: async (values) => {
       try {
@@ -52,6 +53,7 @@ export default function Page() {
           title: values.title,
           type: 'raffle',
           workspace: pathname.split('/')[3],
+          whiteList: values.whiteList,
         });
 
         const form = {
@@ -96,6 +98,9 @@ export default function Page() {
     setSelectedType(null);
   };
 
+  const handleFormAuthWhitelistChange = (newWhitelist: string[]) => {
+    formik.setFieldValue('whiteList', newWhitelist);
+  };
   return (
     <Container maxWidth="xl">
       <Typography mt={0} mb={1} variant="h4">
@@ -120,7 +125,10 @@ export default function Page() {
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
           <Paper elevation={2} sx={{ height: 300 }}>
-            <WidgetPanel onSelect={(type, options) => handleWidgetAdded(type, options)} />
+            <WidgetPanel
+              onSelect={(type, options) => handleWidgetAdded(type, options)}
+              onFormAuthWhitelistChange={handleFormAuthWhitelistChange}
+            />
           </Paper>
         </Stack>
         <Stack flex={4}>

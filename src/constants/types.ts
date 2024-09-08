@@ -50,6 +50,7 @@ export interface AirlinkAPI {
   type: string;
   form?: FormAPI;
   workspace: string;
+  whiteList?: Array<string>;
 }
 
 export interface QuestionType {
@@ -72,4 +73,13 @@ export interface FormValues {
   description: string;
   components: Component[];
   correctAnswer?: [string] | [] | any | string;
+  whiteList: string[];
+}
+
+export interface FormData {
+  nftEnabled: boolean;
+  nftName: string;
+  nftDescription: string;
+  nftImage: string;
+  recipientAddress: string;
 }
