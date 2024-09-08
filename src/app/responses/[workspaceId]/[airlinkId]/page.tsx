@@ -14,10 +14,8 @@ import ResponseContent from 'src/sections/responses/ResponseContent';
 
 export default function Page() {
   return (
-    <Container maxWidth="md">
-      <DashboardLayout>
-        <ResponseContent />
-      </DashboardLayout>
-    </Container>
+    <DashboardLayout>
+      <ResponseContent />
+    </DashboardLayout>
   );
 }

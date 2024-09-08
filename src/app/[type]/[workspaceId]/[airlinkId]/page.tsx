@@ -9,9 +9,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return (
-    <Container maxWidth="md">
-      <FormContent />
-    </Container>
-  );
+  return <FormContent />;
 }
