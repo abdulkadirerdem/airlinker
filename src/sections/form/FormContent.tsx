@@ -104,7 +104,9 @@ export default function FormContent() {
 
     try {
       console.log('🚀 ~ handleSubmit ~ formData:', formData, answers);
-      await mutateAsync({ id: formData[workspaceType]._id, data: answers });
+
+
+      await mutateAsync({ id: formData[workspaceType]._id, data: workspaceType === "quiz" ? { answers } : answers });
       // Başarılı işlem sonrası yapılacaklar
       console.log('Form submitted successfully');
 
@@ -136,7 +138,7 @@ export default function FormContent() {
       >
         {(
           formData[workspaceType]?.[
-            workspaceType === 'raffle' ? 'participationInformation' : 'questions'
+          workspaceType === 'raffle' ? 'participationInformation' : 'questions'
           ] || []
         ).map((question: QuestionType, qIndex: number) => (
           <QuestionRenderer

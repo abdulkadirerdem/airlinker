@@ -154,7 +154,7 @@ export default function ResponseContent() {
             <Divider sx={{ mb: 2, borderWidth: 0.25 }} />
             {formData[formData.type]?.[
               formData.type === 'raffle' ? 'participationInformation' : 'questions'
-            ].map((question: any) => (
+            ].map((question: any, index: any) => (
               <QuestionWithAnswer
                 key={question._id}
                 questionTitle={question.title}
@@ -162,6 +162,7 @@ export default function ResponseContent() {
                   response.answers.filter((item: any) => item.questionId === question._id)[0]
                     ?.answer || 'Yanıt yok'
                 }
+                index={index}
               />
             ))}
           </Paper>
