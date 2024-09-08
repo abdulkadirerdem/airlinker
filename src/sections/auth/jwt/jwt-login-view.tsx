@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import Link from '@mui/material/Link';
-import { Button } from '@mui/material';
+import { Button, Divider, useTheme } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -31,7 +31,7 @@ import FormProvider, { RHFTextField } from 'src/components/hook-form';
 
 export default function JwtLoginView() {
   const { login } = useAuthContext();
-
+  const theme = useTheme();
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState('');
@@ -74,11 +74,14 @@ export default function JwtLoginView() {
     }
   });
 
-  const renderHead = (
-    <Stack spacing={2} sx={{ mb: 5 }}>
-      <Typography variant="h4">Sign in to Airlinker</Typography>
 
-      <Stack direction="row" spacing={0.5}>
+  const renderHead = (
+    <Stack spacing={0} sx={{ mb: 2 }}>
+      <Typography variant="h4">Sign in to Airlinker </Typography>
+      <Typography variant="subtitle1" mb={1} fontWeight={300}>with your <span style={{ textDecoration: 'underline', color: theme.palette.error.main, fontWeight: 'bold' }}>Wallet</span> </Typography>
+      <LoginWithWallet />
+      <Divider variant='middle' sx={{ my: 3, borderColor: theme.palette.divider }}><Typography variant="subtitle2" fontWeight={200}>Or continue with <span style={{ fontWeight: 'bold', textDecoration: 'underline', }}>Email</span></Typography></Divider>
+      <Stack direction="row" mt={0} spacing={0.5}>
         <Typography variant="body2">New user?</Typography>
 
         <Link component={RouterLink} href={paths.auth.jwt.register} variant="subtitle2">
@@ -122,12 +125,12 @@ export default function JwtLoginView() {
         Login
       </LoadingButton>
 
-      <LoginWithWallet />
     </Stack>
   );
 
   return (
     <>
+
       {renderHead}
 
       {/* <Alert severity="info" sx={{ mb: 3 }}>
@@ -139,6 +142,8 @@ export default function JwtLoginView() {
           {errorMsg}
         </Alert>
       )}
+
+
 
       <FormProvider methods={methods} onSubmit={onSubmit}>
         {renderForm}
