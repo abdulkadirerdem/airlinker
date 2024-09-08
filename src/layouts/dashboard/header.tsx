@@ -39,6 +39,7 @@ export default function Header({ onOpenNav }: Props) {
   const offsetTop = offset && !isNavHorizontal;
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
+
   const onClick = useCallback(async () => {
     if (!publicKey) {
       console.log('error', `Send Transaction: Wallet not connected!`);

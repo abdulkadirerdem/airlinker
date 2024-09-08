@@ -39,6 +39,7 @@ export interface RaffleAPI {
     options: Array<string>;
   }>;
   participants?: Array<{ answers: Array<any> }>;
+  prizeAmount: number;
   winner?: any;
   airlink: string;
 }
@@ -74,6 +75,8 @@ export interface FormValues {
   components: Component[];
   correctAnswer?: [string] | [] | any | string;
   whiteList: string[];
+  prize: string;
+  type: string;
 }
 
 export interface FormData {
