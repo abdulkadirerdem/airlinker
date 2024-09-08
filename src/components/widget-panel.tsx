@@ -1,6 +1,6 @@
 import { OverridableStringUnion } from '@mui/types';
 import { ButtonPropsColorOverrides } from '@mui/material/Button';
-import { Box, Stack, Button, Divider, Typography, Grid } from '@mui/material';
+import { Box, Stack, Button, Divider, Typography, Grid, useTheme } from '@mui/material';
 import Iconify from './iconify';
 
 const widgets: Array<{
@@ -42,11 +42,16 @@ const widgets: Array<{
 
   ];
 
+const whiteList = ["text", "multiple-choice", "radio", "connect-wallet"]
+
 export default function WidgetPanel({
   onSelect,
 }: {
   onSelect: (type: string, options?: string[]) => void;
 }) {
+  const theme = useTheme()
+
+
   const renderWidgets = (category: 'Primary' | 'Secondary' | 'Other') => (
     <Stack spacing={1} mb={2}>
       <Typography variant="subtitle1" fontWeight={600} color="lightgrey" >
@@ -71,9 +76,10 @@ export default function WidgetPanel({
                 }}
                 onClick={() => onSelect(widget.type, widget.defaultOptions)}
                 variant="contained"
+                disabled={!whiteList.includes(widget.type)}
               >
                 <Stack alignItems={"center"} gap={1}>
-                  <Iconify width={36} icon={widget.icon} color={"lightgrey"} />
+                  <Iconify width={36} icon={widget.icon} color={whiteList.includes(widget.type) ? theme.palette.primary.lighter : theme.palette.grey[400]} />
                   <Typography variant='caption' color='textSecondary' sx={{ ":hover": { color: "inherit" } }} fontWeight={700}>{widget.label}</Typography>
                 </Stack>
               </Button>
