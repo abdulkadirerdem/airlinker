@@ -18,6 +18,9 @@ import { createAirlink } from 'src/api/airlink/createAirlink';
 import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
 import { FormValues } from 'src/constants/types';
+import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
+import Image from 'next/image';
+
 
 export default function Page() {
   const pathname = usePathname();
@@ -128,7 +131,17 @@ export default function Page() {
             />
           </Paper>
         </Stack>
-        <Stack flex={{ md: 0, lg: 2 }} />
+        <Stack flex={{ md: 0, lg: 2 }}>
+          <Image
+            src={BuilderBadge}
+            alt="My Image"
+            width={500}
+            height={300}
+            objectFit="contain"
+            layout="responsive"
+            priority
+          />
+        </Stack>
       </Stack>
     </Container>
   );
