@@ -24,6 +24,7 @@ import { useAuthContext } from 'src/auth/hooks';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
+import LoginWithWallet from 'src/components/wallet-login';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 
 // ----------------------------------------------------------------------
@@ -121,7 +122,7 @@ export default function JwtLoginView() {
         Login
       </LoadingButton>
 
-      <Button onClick={handleGoogleLogin}>Google Auth</Button>
+      <LoginWithWallet />
     </Stack>
   );
 

@@ -21,7 +21,6 @@ import { FormValues } from 'src/constants/types';
 import Image from 'next/image';
 import BuilderBadge from "../../../../assets/illustrations/builder-quiz.png"
 
-
 export default function Page() {
   const pathname = usePathname();
   const router = useRouter();
@@ -38,26 +37,34 @@ export default function Page() {
     mutationFn: createQuiz,
   });
 
-
   const formik = useFormik<FormValues>({
     initialValues: {
       title: 'Quiz Title',
       description: 'Quiz Description',
       components: [],
+      whiteList: [],
     },
     onSubmit: async (values) => {
-      console.info(values)
-      console.info(values.components.map((item) =>
-        item.type === 'connect-wallet'
-          ? { type: item.type, title: 'Connect Wallet', options: [] }
-          : { type: item.type, options: item.options || [], title: item.label, correctAnswer: values.correctAnswer }
-      ),)
+      console.info(values);
+      console.info(
+        values.components.map((item) =>
+          item.type === 'connect-wallet'
+            ? { type: item.type, title: 'Connect Wallet', options: [] }
+            : {
+                type: item.type,
+                options: item.options || [],
+                title: item.label,
+                correctAnswer: values.correctAnswer,
+              }
+        )
+      );
       try {
         const airlink = await createAirlinkMutation({
           description: values.description,
           title: values.title,
           type: 'quiz',
           workspace: pathname.split('/')[3],
+          whiteList: values.whiteList,
         });
 
         const form = {
@@ -66,9 +73,13 @@ export default function Page() {
           questions: values.components.map((item) =>
             item.type === 'connect-wallet'
               ? { type: item.type, title: 'Connect Wallet', options: [] }
-              : { type: item.type, options: item.options || [], title: item.label, correctAnswer: item.correctAnswer }
+              : {
+                  type: item.type,
+                  options: item.options || [],
+                  title: item.label,
+                  correctAnswer: item.correctAnswer,
+                }
           ),
-
         };
 
         await createFormMutation({
@@ -96,6 +107,9 @@ export default function Page() {
     setSelectedType(null);
   };
 
+  const handleFormAuthWhitelistChange = (newWhitelist: string[]) => {
+    formik.setFieldValue('whiteList', newWhitelist);
+  };
   return (
     <Container maxWidth="xl">
       <Typography mt={0} mb={1} variant="h4">
@@ -120,7 +134,10 @@ export default function Page() {
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
           <Paper elevation={2} sx={{ height: 300 }}>
-            <WidgetPanel onSelect={(type, options) => handleWidgetAdded(type, options)} />
+            <WidgetPanel
+              onSelect={(type, options) => handleWidgetAdded(type, options)}
+              onFormAuthWhitelistChange={handleFormAuthWhitelistChange}
+            />
           </Paper>
         </Stack>
         <Stack flex={4}>
@@ -129,7 +146,7 @@ export default function Page() {
               formik={formik}
               selectedType={selectedType}
               onWidgetAdded={handleWidgetAdded}
-              formType='quiz'
+              formType="quiz"
             />
           </Paper>
         </Stack>

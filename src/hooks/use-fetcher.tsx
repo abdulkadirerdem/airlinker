@@ -7,6 +7,7 @@ function useFetcher<T = any>(args: string | [string, AxiosRequestConfig] | null,
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);

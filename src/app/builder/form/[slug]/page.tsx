@@ -21,7 +21,6 @@ import { FormValues } from 'src/constants/types';
 import Image from 'next/image';
 import BuilderBadge from "../../../../assets/illustrations/builder-forms.png"
 
-
 export default function Page() {
   const pathname = usePathname();
   const router = useRouter();
@@ -43,6 +42,7 @@ export default function Page() {
       title: 'Form Title',
       description: 'Form Description',
       components: [],
+      whiteList: [],
     },
     onSubmit: async (values) => {
       try {
@@ -51,6 +51,7 @@ export default function Page() {
           title: values.title,
           type: 'form',
           workspace: pathname.split('/')[3],
+          whiteList: values.whiteList,
         });
 
         const form = {
@@ -88,6 +89,10 @@ export default function Page() {
     setSelectedType(null);
   };
 
+  const handleFormAuthWhitelistChange = (newWhitelist: string[]) => {
+    formik.setFieldValue('whiteList', newWhitelist);
+  };
+
   return (
     <Container maxWidth="xl">
       <Typography mt={0} mb={1} variant="h4">
@@ -111,8 +116,11 @@ export default function Page() {
 
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
-          <Paper elevation={2} sx={{ maxHeight: "100%", width: 320 }}>
-            <WidgetPanel onSelect={(type, options) => handleWidgetAdded(type, options)} />
+          <Paper elevation={2} sx={{ maxHeight: '100%', width: 320 }}>
+            <WidgetPanel
+              onSelect={(type, options) => handleWidgetAdded(type, options)}
+              onFormAuthWhitelistChange={handleFormAuthWhitelistChange}
+            />
           </Paper>
         </Stack>
         <Stack flex={4}>

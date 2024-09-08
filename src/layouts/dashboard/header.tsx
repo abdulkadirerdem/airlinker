@@ -1,18 +1,20 @@
+import { useCallback } from 'react';
+import * as solanaWeb3 from '@solana/web3.js';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+
 import Stack from '@mui/material/Stack';
-import { Box, Link } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
+import { Box, Button, Link } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 
 import { useOffSetTop } from 'src/hooks/use-off-set-top';
 import { useResponsive } from 'src/hooks/use-responsive';
 
-import { bgBlur } from 'src/theme/css';
-
 import { useSettingsContext } from 'src/components/settings';
 
-import { NAV, HEADER } from '../config-layout';
+import { HEADER } from '../config-layout';
 import AccountPopover from '../common/account-popover';
 
 // ----------------------------------------------------------------------
@@ -35,6 +37,49 @@ export default function Header({ onOpenNav }: Props) {
   const offset = useOffSetTop(HEADER.H_DESKTOP);
 
   const offsetTop = offset && !isNavHorizontal;
+  const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
+  const onClick = useCallback(async () => {
+    if (!publicKey) {
+      console.log('error', `Send Transaction: Wallet not connected!`);
+      return;
+    }
+
+    let signature: solanaWeb3.TransactionSignature = '';
+    try {
+      // Create instructions to send, in this case a simple transfer
+      const instructions = [
+        solanaWeb3.SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: solanaWeb3.Keypair.generate().publicKey,
+          lamports: 1_000_000,
+        }),
+      ];
+
+      // Get the lates block hash to use on our transaction and confirmation
+      const latestBlockhash = await connection.getLatestBlockhash();
+
+      // Create a new TransactionMessage with version and compile it to legacy
+      const messageLegacy = new solanaWeb3.TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: latestBlockhash.blockhash,
+        instructions,
+      }).compileToLegacyMessage();
+
+      // Create a new VersionedTransacction which supports legacy and v0
+      const transation = new solanaWeb3.VersionedTransaction(messageLegacy);
+
+      // Send transaction and await for signature
+      signature = await sendTransaction(transation, connection);
+
+      // Send transaction and await for signature
+      await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
+
+      console.log(signature);
+    } catch (error: any) {
+      console.log('error', `Transaction failed! ${error?.message}`, signature);
+    }
+  }, [publicKey, connection, sendTransaction]);
 
   const renderContent = (
     <>
@@ -69,13 +114,19 @@ export default function Header({ onOpenNav }: Props) {
         spacing={{ xs: 0.5, sm: 1 }}
       >
         {/* <LanguagePopover /> */}
-
         {/* <NotificationsPopover /> */}
-
         {/* <ContactsPopover /> */}
-
         {/* <SettingsButton /> */}
-
+        {/* <Button
+            variant="contained"
+            sx={{ marginLeft: 'auto', mt: 1, borderRadius: 0.5 }}
+            color="primary"
+            onClick={onClick}
+          >
+            SEND SOL
+          </Button>
+          */}
+        <WalletMultiButton />
         <AccountPopover />
       </Stack>
     </>

@@ -18,8 +18,9 @@ import { createAirlink } from 'src/api/airlink/createAirlink';
 import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
 import { FormValues } from 'src/constants/types';
-import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
 import Image from 'next/image';
+
+import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
 
 
 export default function Page() {
@@ -43,6 +44,7 @@ export default function Page() {
       title: 'Raffle Title',
       description: 'Raffle Description',
       components: [],
+      whiteList: [],
     },
     onSubmit: async (values) => {
       try {
@@ -51,6 +53,7 @@ export default function Page() {
           title: values.title,
           type: 'raffle',
           workspace: pathname.split('/')[3],
+          whiteList: values.whiteList,
         });
 
         const form = {
@@ -95,6 +98,9 @@ export default function Page() {
     setSelectedType(null);
   };
 
+  const handleFormAuthWhitelistChange = (newWhitelist: string[]) => {
+    formik.setFieldValue('whiteList', newWhitelist);
+  };
   return (
     <Container maxWidth="xl">
       <Typography mt={0} mb={1} variant="h4">
@@ -119,7 +125,10 @@ export default function Page() {
       <Stack direction="row" spacing={2}>
         <Stack flex={2}>
           <Paper elevation={2} sx={{ height: 300 }}>
-            <WidgetPanel onSelect={(type, options) => handleWidgetAdded(type, options)} />
+            <WidgetPanel
+              onSelect={(type, options) => handleWidgetAdded(type, options)}
+              onFormAuthWhitelistChange={handleFormAuthWhitelistChange}
+            />
           </Paper>
         </Stack>
         <Stack flex={4}>
