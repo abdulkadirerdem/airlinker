@@ -17,7 +17,9 @@ import {
   Cell,
 } from 'recharts';
 
+
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+        import { Container } from '@mui/system';
 import {
   Box,
   Tab,
@@ -30,7 +32,11 @@ import {
   IconButton,
   CardContent,
   Container,
+     Divider,
+     TextField,
+    InputAdornment
 } from '@mui/material';
+
 
 import { usePathname } from 'src/routes/hooks';
 
@@ -38,7 +44,11 @@ import { drawWinner } from 'src/api/raffle/drawWinner';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
 
 import QuestionWithAnswer from 'src/components/questions-with-answers';
+
+import { useSolanaTransfer } from 'src/components/web-3/useSolanaTransfer';
+
 import { Icon } from '@iconify/react';
+
 
 // ----------------------------------------------------------------------
 
@@ -50,12 +60,15 @@ export default function ResponseContent() {
   const pathname = usePathname();
   const workspaceId = pathname.split('/')[2];
   const airlinkId = pathname.split('/')[3];
-  const [winner, setWinner] = useState<string | null>(null); // State to hold the winner
+  const [winner, setWinner] = useState<string | null>(null);
+  const [winnerAddress, setWinnerAddress] = useState<string>('');
   const [isRaffling, setIsRaffling] = useState(false);
   const [currentParticipant, setCurrentParticipant] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
   const [viewMode, setViewMode] = useState<'card' | 'grid'>('card');
   const [tabValue, setTabValue] = useState(0);
+
+  const { transfer, isLoading: isTransferLoading } = useSolanaTransfer();
 
   const {
     data,
@@ -92,7 +105,18 @@ export default function ResponseContent() {
   // Check if formData is valid and has a type
   if (!formData || !formData.type) return <p style={{ padding: 5 }}>Invalid data!</p>; // Added check
 
-  if (isLoading) return 'Loading...';
+
+  if (isLoading || isTransferLoading) return 'Loading...';
+
+  const handleTransfer = async (recieveAddress: string, prizeAmount: number) => {
+    const { signature, error } = await transfer(recieveAddress, prizeAmount, 'devnet');
+    if (signature) {
+      console.log('Transfer successful:', signature);
+    } else {
+      console.error('Transfer failed:', error);
+    }
+  };
+
 
   // Updated function to draw a winner
   const drawServerSideWinner = async () => {
@@ -105,7 +129,7 @@ export default function ResponseContent() {
         // Start the animation
         animationInterval = setInterval(() => {
           const randomParticipant = participants[Math.floor(Math.random() * participants.length)];
-          setCurrentParticipant(randomParticipant.answers[0].answer);
+          setCurrentParticipant(randomParticipant.answers[1].answer);
         }, 100);
 
         // Call the server-side mutation
@@ -115,7 +139,10 @@ export default function ResponseContent() {
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         // @ts-ignore
-        setWinner(result.winner.answers[0].answer);
+        setWinner(result.winner.answers[1].answer);
+        // @ts-ignore
+        setWinnerAddress(result.winner.answers[0].answer);
+
         setShowConfetti(true);
       } catch (error) {
         console.error('Error drawing winner:', error);
@@ -188,9 +215,11 @@ export default function ResponseContent() {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   return (
-    <Container maxWidth="lg">
+
+    <Container maxWidth="md">
       <Paper elevation={12} sx={{ p: 2, px: 4, mt: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+
           <Box>
             <Typography variant="h4" gutterBottom>
               {formData.title || 'No Title'}
@@ -200,121 +229,30 @@ export default function ResponseContent() {
             </Typography>
           </Box>
           {formData.type === 'raffle' && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={drawServerSideWinner}
-              disabled={isPending}
-              sx={{ mb: 2 }}
-            >
-              {isPending ? 'Drawing...' : 'Draw Raffle Winner'}
-            </Button>
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+              <TextField
+                label="Solana Prize"
+                variant="outlined"
+                size="small"
+                value={formData.raffle.prizeAmount}
+                disabled
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">SOL</InputAdornment>,
+                }}
+                sx={{ width: '150px' }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={drawServerSideWinner}
+                disabled={isPending}
+              >
+                {isPending ? 'Drawing...' : 'Draw Raffle Winner'}
+              </Button>
+            </Box>
           )}
         </Box>
-
-        {/* View mode switch */}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <IconButton onClick={handleViewModeChange}>
-            {tabValue !== 1 &&
-              (viewMode === 'card' ? <Icon icon="mdi:cards-outline" /> : <Icon icon="mdi:table" />)}
-          </IconButton>
-        </Box>
-
-        {/* Tabs */}
-        <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-          <Tab label="Responses" />
-          <Tab label="Charts" />
-        </Tabs>
-
-        {tabValue === 0 &&
-          (viewMode === 'card' ? (
-            <Grid container spacing={2}>
-              {responses.map((response: any, index: number) => (
-                <Grid item xs={12} md={6} key={response._id}>
-                  <Card>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        Client {index + 1}
-                      </Typography>
-                      {questions.map((question: any, questionIndex: number) => (
-                        <QuestionWithAnswer
-                          key={question._id}
-                          questionTitle={question.title}
-                          answer={
-                            response.answers.find((item: any) => item.questionId === question._id)
-                              ?.answer || 'No answer'
-                          }
-                          questionIndex={questionIndex}
-                        />
-                      ))}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 5 },
-                },
-              }}
-              pageSizeOptions={[5, 10]}
-              checkboxSelection
-            />
-          ))}
-
-        {tabValue === 1 && (
-          <>
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-              Answer Distribution
-            </Typography>
-            <Grid container spacing={2}>
-              {pieChartData.map((item: any, index: number) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Typography variant="subtitle1" align="center" gutterBottom>
-                    {item.question}
-                  </Typography>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={item.data}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {item.data.map((entry: any, i: number) => (
-                          <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Grid>
-              ))}
-            </Grid>
-
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-              Response Counts
-            </Typography>
-            <ResponsiveContainer width={500} height={400}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="question" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="count" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </>
-        )}
 
         {/* Raffle Animation */}
         {isRaffling && (
@@ -331,9 +269,41 @@ export default function ResponseContent() {
             <Typography variant="h4" gutterBottom>
               Winner: {winner}
             </Typography>
+            {winner !== null && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleTransfer(winnerAddress, formData.raffle.prizeAmount)}
+              >
+                Send SOL
+              </Button>
+            )}
             {showConfetti && <Confetti />}
           </Box>
         )}
+        {formData[formData.type]?.[formData.type === 'raffle' ? 'participants' : 'responses']?.map(
+          (response: any, index: number) => (
+            <Paper elevation={6} sx={{ p: 2, mt: 3 }} key={response._id}>
+              <Typography variant="h5" gutterBottom>
+                Client {index + 1}
+              </Typography>
+              <Divider sx={{ mb: 2, borderWidth: 0.25 }} />
+              {formData[formData.type]?.[
+                formData.type === 'raffle' ? 'participationInformation' : 'questions'
+              ].map((question: any, questionIndex: number) => (
+                <QuestionWithAnswer
+                  key={question._id}
+                  questionTitle={question.title}
+                  answer={
+                    response.answers.filter((item: any) => item.questionId === question._id)[0]
+                      ?.answer || 'Yanıt yok'
+                  }
+                  questionIndex={questionIndex}
+                />
+              ))}
+            </Paper>
+          )
+        ) || <p>No Responses Available</p>}
       </Paper>
     </Container>
   );

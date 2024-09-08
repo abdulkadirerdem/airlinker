@@ -20,8 +20,7 @@ import WidgetPanel from 'src/components/widget-panel';
 import { FormValues } from 'src/constants/types';
 import Image from 'next/image';
 
-import BuilderBadge from "../../../../assets/illustrations/builder-raffle.png"
-
+import BuilderBadge from '../../../../assets/illustrations/builder-raffle.png';
 
 export default function Page() {
   const pathname = usePathname();
@@ -41,8 +40,10 @@ export default function Page() {
 
   const formik = useFormik<FormValues>({
     initialValues: {
+      type: 'raffle',
       title: 'Raffle Title',
       description: 'Raffle Description',
+      prize: '0',
       components: [],
       whiteList: [],
     },
@@ -59,6 +60,7 @@ export default function Page() {
         const form = {
           title: values.title,
           description: values.description,
+          prizeAmount: Number(values.prize),
           questions: values.components.map(
             (item): { type: string; title: string; options: string[] } => {
               if (item.type === 'connect-wallet') {
@@ -75,6 +77,7 @@ export default function Page() {
 
         await createFormMutation({
           description: form.description,
+          prizeAmount: form.prizeAmount,
           title: form.title,
           // @ts-ignore
           airlink: airlink._id,
@@ -115,7 +118,7 @@ export default function Page() {
             mr: 2.5,
             position: 'absolute',
             top: 62,
-            left: 220,
+            left: 300,
             zIndex: 9,
           }}
         />
@@ -137,6 +140,7 @@ export default function Page() {
               formik={formik}
               selectedType={selectedType}
               onWidgetAdded={handleWidgetAdded}
+              formType="raffle"
             />
           </Paper>
         </Stack>
