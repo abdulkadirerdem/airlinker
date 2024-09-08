@@ -2,29 +2,19 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
-import {
-  Box,
-  Radio,
-  Paper,
-  Alert,
-  Button,
-  Checkbox,
-  Snackbar,
-  TextField,
-  Typography,
-  RadioGroup,
-  FormControl,
-  FormControlLabel,
-} from '@mui/material';
+import { Box, Paper, Alert, Button, Snackbar, Typography } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { QuestionType } from 'src/constants/types';
 import { submitForm } from 'src/api/form/submitForm';
+import { submitQuiz } from 'src/api/quiz/submitQuiz';
+import { submitRaffle } from 'src/api/raffle/submitRaffle';
 import { getAllAirlinksByWorkspace } from 'src/api/airlink/getAllAirlinksByWorkspace';
+
+import QuestionRenderer from './QuestionRenderer';
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +24,7 @@ export const metadata = {
 
 export default function FormContent() {
   const pathname = usePathname();
+  const workspaceType = pathname.split('/')[1];
   const workspaceId = pathname.split('/')[2];
   const airlinkId = pathname.split('/')[3];
   const [answers, setAnswers] = useState<{ [key: string]: string | string[] }>({});
@@ -52,9 +43,18 @@ export default function FormContent() {
     },
   });
 
+  let mutationFn;
+  if (workspaceType === 'raffle') {
+    mutationFn = submitRaffle;
+  } else if (workspaceType === 'quiz') {
+    mutationFn = submitQuiz;
+  } else {
+    mutationFn = submitForm;
+  }
+
   const { isPending, mutateAsync } = useMutation({
-    mutationKey: ['submit-form'],
-    mutationFn: submitForm,
+    mutationKey: ['submit-form', workspaceType],
+    mutationFn,
   });
 
   if (queryError) {
@@ -65,21 +65,23 @@ export default function FormContent() {
     !isLoading && data !== undefined ? data.filter((item) => item?._id === airlinkId)[0] : [];
 
   const validateForm = (): boolean => {
-    const { questions } = formData.form;
+    const { participationInformation, questions } = formData[workspaceType] || {}; // Ensure safe destructuring
 
-    const hasError = questions.some((question: QuestionType) => {
-      const answer = answers[question._id];
+    const hasError = (workspaceType === 'raffle' ? participationInformation : questions)?.some(
+      (question: QuestionType) => {
+        const answer = answers[question._id];
 
-      // Eğer sorunun yanıtı eksikse
-      if (
-        question.required &&
-        (answer === undefined || answer === '' || (Array.isArray(answer) && answer.length === 0))
-      ) {
-        setError(`Question "${question.title}" is required.`);
-        return true;
+        // Eğer sorunun yanıtı eksikse
+        if (
+          question.required &&
+          (answer === undefined || answer === '' || (Array.isArray(answer) && answer.length === 0))
+        ) {
+          setError(`Question "${question.title}" is required.`);
+          return true;
+        }
+        return false;
       }
-      return false;
-    });
+    );
 
     if (!hasError) {
       setError(null);
@@ -101,7 +103,8 @@ export default function FormContent() {
     }
 
     try {
-      await mutateAsync({ id: formData.form._id, data: answers });
+      console.log('🚀 ~ handleSubmit ~ formData:', formData, answers);
+      await mutateAsync({ id: formData[workspaceType]._id, data: answers });
       // Başarılı işlem sonrası yapılacaklar
       console.log('Form submitted successfully');
 
@@ -112,8 +115,6 @@ export default function FormContent() {
   };
 
   if (isLoading) return 'Loading...';
-
-  console.log('🚀 ~ FormContent ~ formData:', formData);
 
   return (
     <Paper elevation={12} sx={{ p: 2, px: 4, mt: 4 }}>
@@ -133,61 +134,18 @@ export default function FormContent() {
           handleSubmit();
         }}
       >
-        {formData.form.questions.map((question: QuestionType, qIndex: number) => (
-          <FormControl key={question._id} component="fieldset" margin="normal" fullWidth>
-            <Typography variant="h6" fontWeight={500} mb={0.5}>
-              <span style={{ fontWeight: 700 }}>{`${qIndex + 1}. `}</span>
-              {question.title}
-              {question.type === 'multiple-choice' && (
-                <span style={{ fontWeight: 700, fontSize: 12, color: 'red', marginLeft: 8 }}>
-                  Multiple Choice
-                </span>
-              )}
-            </Typography>
-            {question.type === 'radio' && (
-              <RadioGroup
-                name={question.title}
-                onChange={(e) => handleInputChange(question._id, e.target.value)}
-              >
-                {question.options.map((option, index) => (
-                  <FormControlLabel key={index} value={option} control={<Radio />} label={option} />
-                ))}
-              </RadioGroup>
-            )}
-            {question.type === 'multiple-choice' && (
-              <>
-                {question.options.map((option, index) => (
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox
-                        onChange={(e) => {
-                          const value = answers[question._id] || [];
-                          handleInputChange(
-                            question._id,
-                            e.target.checked
-                              ? [...(value as string[]), option]
-                              : (value as string[]).filter((v) => v !== option)
-                          );
-                        }}
-                      />
-                    }
-                    label={option}
-                  />
-                ))}
-              </>
-            )}
-            {question.type === 'text' && (
-              <TextField
-                size="small"
-                fullWidth
-                variant="outlined"
-                placeholder="Type answer.."
-                onChange={(e) => handleInputChange(question._id, e.target.value)}
-              />
-            )}
-            {question.type === 'connect-wallet' && <WalletMultiButton />}
-          </FormControl>
+        {(
+          formData[workspaceType]?.[
+            workspaceType === 'raffle' ? 'participationInformation' : 'questions'
+          ] || []
+        ).map((question: QuestionType, qIndex: number) => (
+          <QuestionRenderer
+            key={question._id}
+            question={question}
+            qIndex={qIndex}
+            answers={answers}
+            handleInputChange={handleInputChange}
+          />
         ))}
         <Box mt={4}>
           <Button variant="contained" color="primary" type="submit">
