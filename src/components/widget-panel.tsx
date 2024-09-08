@@ -78,7 +78,7 @@ export default function WidgetPanel({
                 variant="contained"
                 disabled={!whiteList.includes(widget.type)}
               >
-                <Stack alignItems={"center"} gap={1}>
+                <Stack alignItems="center" gap={1}>
                   <Iconify width={36} icon={widget.icon} color={whiteList.includes(widget.type) ? theme.palette.primary.lighter : theme.palette.grey[400]} />
                   <Typography variant='caption' color='textSecondary' sx={{ ":hover": { color: "inherit" } }} fontWeight={700}>{widget.label}</Typography>
                 </Stack>
@@ -90,7 +90,7 @@ export default function WidgetPanel({
   );
 
   return (
-    <Box p={2} width={"100%"}>
+    <Box p={2} width="100%">
       {renderWidgets('Primary')}
       {renderWidgets('Secondary')}
       {renderWidgets('Other')}
