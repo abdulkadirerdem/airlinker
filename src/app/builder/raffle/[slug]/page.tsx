@@ -17,18 +17,7 @@ import { createAirlink } from 'src/api/airlink/createAirlink';
 
 import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
-
-interface Component {
-  type: string;
-  label: string;
-  options?: string[];
-}
-
-interface FormValues {
-  title: string;
-  description: string;
-  components: Component[];
-}
+import { FormValues } from 'src/constants/types';
 
 export default function Page() {
   const pathname = usePathname();
@@ -136,7 +125,6 @@ export default function Page() {
               formik={formik}
               selectedType={selectedType}
               onWidgetAdded={handleWidgetAdded}
-              workspaceId={pathname.split('/')[2]}
             />
           </Paper>
         </Stack>

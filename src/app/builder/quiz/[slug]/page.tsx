@@ -17,19 +17,9 @@ import { createAirlink } from 'src/api/airlink/createAirlink';
 
 import FormBuilder from 'src/components/form-builder';
 import WidgetPanel from 'src/components/widget-panel';
+import { FormValues } from 'src/constants/types';
+import * as Yup from 'yup';
 
-interface Component {
-  type: string;
-  label: string;
-  options?: string[];
-  correctAnswer?: string;
-}
-
-interface FormValues {
-  title: string;
-  description: string;
-  components: Component[];
-}
 
 export default function Page() {
   const pathname = usePathname();
@@ -47,13 +37,48 @@ export default function Page() {
     mutationFn: createQuiz,
   });
 
+
+  // Yup Doğrulama Şeması
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().required('Title is required').min(3, 'Title must be at least 3 characters'),
+    description: Yup.string().required('Description is required').min(10, 'Description must be at least 10 characters'),
+    components: Yup.array()
+      .of(
+        Yup.object().shape({
+          type: Yup.string().required('Component type is required').oneOf(['text', 'radio', 'multiple-choice', 'connect-wallet']),
+          label: Yup.string().required('Label is required').min(3, 'Label must be at least 3 characters'),
+          options: Yup.array().when('type', {
+            // @ts-ignore
+            is: (type: string) => type === 'radio' || type === 'multiple-choice',
+            then: Yup.array().of(Yup.string().required('Option is required')).min(2, 'At least two options are required'),
+            otherwise: Yup.array().of(Yup.string()).notRequired(),
+          }),
+          correctAnswer: Yup.mixed().when('type', {
+            // @ts-ignore
+            is: 'radio',
+            then: Yup.string().required('Correct answer is required for radio type'),
+            otherwise: Yup.array().of(Yup.string()).notRequired(),
+          }),
+        })
+      )
+      .min(1, 'At least one component is required'),
+  });
+
+
   const formik = useFormik<FormValues>({
     initialValues: {
       title: 'Quiz Title',
       description: 'Quiz Description',
       components: [],
     },
+    // validationSchema,
     onSubmit: async (values) => {
+      console.info(values)
+      console.info(values.components.map((item) =>
+        item.type === 'connect-wallet'
+          ? { type: item.type, title: 'Connect Wallet', options: [] }
+          : { type: item.type, options: item.options || [], title: item.label, correctAnswer: values.correctAnswer }
+      ),)
       try {
         const airlink = await createAirlinkMutation({
           description: values.description,
@@ -68,8 +93,9 @@ export default function Page() {
           questions: values.components.map((item) =>
             item.type === 'connect-wallet'
               ? { type: item.type, title: 'Connect Wallet', options: [] }
-              : { type: item.type, options: item.options || [], title: item.label }
+              : { type: item.type, options: item.options || [], title: item.label, correctAnswer: item.correctAnswer }
           ),
+
         };
 
         await createFormMutation({
@@ -130,7 +156,7 @@ export default function Page() {
               formik={formik}
               selectedType={selectedType}
               onWidgetAdded={handleWidgetAdded}
-              workspaceId={pathname.split('/')[2]}
+              formType='quiz'
             />
           </Paper>
         </Stack>
